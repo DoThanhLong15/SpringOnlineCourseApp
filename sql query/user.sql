@@ -1,0 +1,17 @@
+use onlinecourse;
+
+CREATE TABLE user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+	last_name VARCHAR(50) NOT NULL,
+	email VARCHAR(255) NOT NULL UNIQUE,
+	avatar VARCHAR(255) NOT NULL,
+	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    
+    user_role_id INT NOT NULL DEFAULT (2),
+    FOREIGN KEY (user_role_id) REFERENCES user_role(id) 
+);
