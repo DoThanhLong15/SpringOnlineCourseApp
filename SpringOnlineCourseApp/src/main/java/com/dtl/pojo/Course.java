@@ -24,10 +24,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -81,10 +84,16 @@ public class Course implements Serializable {
     private BigDecimal rating;
     @Basic(optional = false)
     @NotNull
+    @Min(value = 0)
     @Column(name = "price")
-    private BigDecimal price;
+    private int price;
     @Column(name = "status")
     private Boolean status;
+    @NotNull
+    @Column(name = "image")
+    private String image;
+    @Transient
+    private MultipartFile file;
     @OneToMany(mappedBy = "courseId")
     private Collection<RegisterDetail> registerDetailCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
@@ -98,6 +107,7 @@ public class Course implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     private Collection<Cart> cartCollection;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @NotNull
     @ManyToOne
     private Category categoryId;
     @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
@@ -111,7 +121,7 @@ public class Course implements Serializable {
         this.id = id;
     }
 
-    public Course(Integer id, String title, String description, BigDecimal price) {
+    public Course(Integer id, String title, String description, int price) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -182,11 +192,11 @@ public class Course implements Serializable {
         this.rating = rating;
     }
 
-    public BigDecimal getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
@@ -291,6 +301,34 @@ public class Course implements Serializable {
     @Override
     public String toString() {
         return "com.dtl.pojo.Course[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the image
+     */
+    public String getImage() {
+        return image;
+    }
+
+    /**
+     * @param image the image to set
+     */
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    /**
+     * @return the file
+     */
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    /**
+     * @param file the file to set
+     */
+    public void setFile(MultipartFile file) {
+        this.file = file;
     }
     
 }

@@ -5,7 +5,6 @@
 package com.dtl.pojo;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,7 +42,7 @@ public class RegisterDetail implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "price")
-    private BigDecimal price;
+    private int price;
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     @ManyToOne
     private Course courseId;
@@ -58,7 +57,7 @@ public class RegisterDetail implements Serializable {
         this.id = id;
     }
 
-    public RegisterDetail(Integer id, BigDecimal price) {
+    public RegisterDetail(Integer id, int price) {
         this.id = id;
         this.price = price;
     }
@@ -71,11 +70,11 @@ public class RegisterDetail implements Serializable {
         this.id = id;
     }
 
-    public BigDecimal getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 

@@ -16,4 +16,20 @@ Software Foundation//DTD Tiles Configuration 3.0//EN"
         <put-attribute name="title" value="Trang chủ" />
         <put-attribute name="content" value="/WEB-INF/pages/home.jsp" />
     </definition>
+    <definition name="courseList" extends="baseLayout">
+        <put-attribute name="title" value="Khóa học" />
+        <put-attribute name="content" value="/WEB-INF/pages/course/list.jsp" />
+    </definition>
+    <definition name="courseForm" extends="baseLayout">
+        <put-attribute name="title" value="Khóa học" />
+        <put-attribute name="content" value="/WEB-INF/pages/course/form.jsp" />
+    </definition>
+    <definition name="userList" extends="baseLayout">
+        <put-attribute name="title" value="Người dùng" />
+        <put-attribute name="content" value="/WEB-INF/pages/user/list.jsp" />
+    </definition>
+    <definition name="userForm" extends="baseLayout">
+        <put-attribute name="title" value="Người dùng" />
+        <put-attribute name="content" value="/WEB-INF/pages/user/form.jsp" />
+    </definition>
 </tiles-definitions>

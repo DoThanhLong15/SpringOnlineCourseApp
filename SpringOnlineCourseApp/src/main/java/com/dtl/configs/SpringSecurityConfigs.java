@@ -53,17 +53,17 @@ public class SpringSecurityConfigs extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.formLogin().usernameParameter("username").passwordParameter("password");
         http.formLogin().defaultSuccessUrl("/").failureUrl("/login?error");
-//        
-        http.logout().logoutSuccessUrl("/login");
-//        
-//        http.exceptionHandling().accessDeniedPage("/login?accessDenied");
-//        
-        http.authorizeRequests().antMatchers("/**").permitAll();
-//                .antMatchers("/**").hasRole("ADMIN");
         
+        http.logout().logoutSuccessUrl("/login");
+        
+        http.exceptionHandling().accessDeniedPage("/login?accessDenied");
+        
+        http.authorizeRequests().antMatchers("/api/**").permitAll()
+                .antMatchers("/**").hasRole("ADMIN");
+
         http.csrf().disable();
     }
-    
+
     @Bean
     public Cloudinary cloudinary() {
         Cloudinary cloudinary

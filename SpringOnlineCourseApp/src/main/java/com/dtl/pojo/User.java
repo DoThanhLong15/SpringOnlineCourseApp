@@ -22,14 +22,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -61,25 +62,28 @@ public class User implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
+    @NotNull(message = "{user.firstName.notNull.errMsg}")
+    @Size(min = 1, max = 50, message = "{user.firstName.size.errMsg}")
     @Column(name = "first_name")
     private String firstName;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
+    @NotNull(message = "{user.lastName.notNull.errMsg}")
+    @Size(min = 1, max = 50, message = "{user.lastName.size.errMsg}")
     @Column(name = "last_name")
     private String lastName;
-    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
+    @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
+            message = "{user.email.notValid.errMsg}")
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
+    @NotNull(message = "{user.email.notNull.errMsg}")
+    @Size(min = 1, max = 255, message = "{user.email.notValid.errMsg}")
     @Column(name = "email")
     private String email;
     @Basic(optional = false)
-    @Size(min = 1, max = 255)
     @Column(name = "avatar")
     private String avatar;
+    @NotNull(message = "{user.avatar.notValid.errMsg}")
+    @Transient
+    private MultipartFile file;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -87,13 +91,13 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
+    @NotNull(message = "{user.username.notNull.errMsg}")
+    @Size(min = 1, max = 50, message = "{user.username.size.errMsg}")
     @Column(name = "username")
     private String username;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 255)
+    @NotNull(message = "{user.password.notNull.errMsg}")
+    @Size(min = 1, max = 255, message = "{user.password.size.errMsg}")
     @Column(name = "password")
     private String password;
     @Column(name = "active")
@@ -110,10 +114,12 @@ public class User implements Serializable {
     private Collection<DoingExercise> doingExerciseCollection;
     @OneToMany(mappedBy = "lecturerId")
     private Collection<Course> courseCollection;
-    @NotNull
+//    @NotNull(message = "{user.userRoleId.notNull.errMsg}")
     @JoinColumn(name = "user_role_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private UserRole userRoleId;
+    @Transient
+    private String oldPassword;
 
     public User() {
     }
@@ -299,4 +305,31 @@ public class User implements Serializable {
         return "com.dtl.pojo.User[ id=" + id + " ]";
     }
 
+    /**
+     * @return the file
+     */
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    /**
+     * @param file the file to set
+     */
+    public void setFile(MultipartFile file) {
+        this.file = file;
+    }
+
+    /**
+     * @return the oldPassword
+     */
+    public String getOldPassword() {
+        return oldPassword;
+    }
+
+    /**
+     * @param oldPassword the oldPassword to set
+     */
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
+    }
 }

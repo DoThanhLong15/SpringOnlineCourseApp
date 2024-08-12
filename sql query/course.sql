@@ -9,8 +9,9 @@ CREATE TABLE course (
     participant_count INT DEFAULT 0,
 	rating_count INT DEFAULT 0,
     rating DECIMAL(3,2) DEFAULT 0.00,
-    price DECIMAL(10,2) NOT NULL DEFAULT (0),
+    price INT NOT NULL DEFAULT (0),
     status BOOLEAN DEFAULT TRUE,
+    image VARCHAR(255) NOT NULL,
     
     lecturer_id INT,
     FOREIGN KEY (lecturer_id) REFERENCES user(id),

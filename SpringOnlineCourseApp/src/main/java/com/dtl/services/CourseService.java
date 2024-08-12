@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.dtl.repository;
+package com.dtl.services;
 
-import com.dtl.pojo.User;
+import com.dtl.pojo.Course;
 import java.util.List;
 import java.util.Map;
 
@@ -12,13 +12,9 @@ import java.util.Map;
  *
  * @author LONG
  */
-public interface UserRepository {
-
-    User getUserByUsername(String username);
-
-    void addOrUpdateUser(User user);
-
-    List<User> getUsers(Map<String, String> params);
-    
-    User getUserById(int id);
+public interface CourseService {
+    List<Course> getCourse(Map<String, String> params);
+    void addOrUpdateCourse(Course course);
+    Course getCourseById(int id);
+    void deleteCourse(int id);
 }

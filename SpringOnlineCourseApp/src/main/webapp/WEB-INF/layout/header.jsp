@@ -6,26 +6,44 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="s" uri="http://www.springframework.org/security/tags" %>
+
+<c:url value="/" var="home"/>
+<c:url value="/logout" var="logout"/>
+<c:url value="/course/list" var="course_list"/>
+<c:url value="/user/list" var="user_list"/>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Khóa học Online</a>
+        <a class="navbar-brand" href="${home}">Khóa học Online</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Danh mục</a>
-                <ul class="dropdown-menu">
-                    <c:forEach items="${categories}" var="category">
-                        <li>
-                            <a class="dropdown-item" href="#">${category.name}</a>
-                        </li>
-                    </c:forEach>
-                </ul>
-            </li>
-        </ul>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="">Danh mục</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${course_list}">Khóa học</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${user_list}">Người dùng</a>
+                </li>
+                <s:authorize access="hasRole('ADMIN')">
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="${home}">
+                            Xin chào
+                            <s:authentication property="principal.username" />
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" href="${logout}">
+                            Đăng xuất
+                        </a>
+                    </li>
+                </s:authorize>
+            </ul>
         </div>
     </div>
 </nav>

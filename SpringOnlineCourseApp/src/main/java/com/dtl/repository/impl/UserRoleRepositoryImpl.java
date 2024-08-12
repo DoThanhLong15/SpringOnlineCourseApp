@@ -6,6 +6,7 @@ package com.dtl.repository.impl;
 
 import com.dtl.pojo.UserRole;
 import com.dtl.repository.UserRoleRepository;
+import java.util.List;
 import javax.persistence.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class UserRoleRepositoryImpl implements UserRoleRepository{
+public class UserRoleRepositoryImpl implements UserRoleRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
 
@@ -31,5 +33,13 @@ public class UserRoleRepositoryImpl implements UserRoleRepository{
 
         return (UserRole) q.getSingleResult();
     }
-    
+
+    @Override
+    public List<UserRole> getUserRoles() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createQuery("From UserRole");
+
+        return q.getResultList();
+    }
+
 }
