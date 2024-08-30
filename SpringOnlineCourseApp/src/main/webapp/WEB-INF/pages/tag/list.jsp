@@ -1,6 +1,6 @@
 <%-- 
     Document   : list
-    Created on : Aug 30, 2024, 3:08:25 PM
+    Created on : Aug 30, 2024, 9:35:49 PM
     Author     : LONG
 --%>
 
@@ -8,14 +8,14 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 
-<c:url value="/categories/list" var="category_list" />
-<c:url value="/categories/form" var="category_form" />
+<c:url value="/tags/list" var="tag_list" />
+<c:url value="/tags/form" var="tag_form" />
 
-<h1 class="text-center text-primary mt-3">DANH SÁCH DANH MỤC</h1>
+<h1 class="text-center text-primary mt-3">DANH SÁCH TỪ KHÓA</h1>
 <div class="row">
     <div class="col-md-2 col-12 bg-secondary">
 
-        <form action="${category_list}">
+        <form action="${tag_list}">
             <div class="mb-3 mt-3">
                 <label for="kw" class="form-label">Từ khóa:</label>
                 <input type="text" class="form-control" id="kw" placeholder="Từ khóa..." name="q">
@@ -26,22 +26,22 @@
         </form>
     </div>
     <div class="col-md-10 col-12">
-        <a class="btn btn-info m-1" href="${category_form}" />Thêm khóa học</a>
+        <a class="btn btn-info m-1" href="${tag_form}" />Thêm từ khóa</a>
         <table class="table table-striped">
             <tr>
                 <th>Id</th>
-                <th>Tên danh mục</th>
+                <th>Từ khóa</th>
                 <th></th>
             </tr>
-            <c:forEach items="${categories}" var="category">
-                <tr id="category-${category.id}">
-                    <td>${category.id}</td>
-                    <td>${category.name}</td>
+            <c:forEach items="${tags}" var="tag">
+                <tr id="tag-${tag.id}">
+                    <td>${tag.id}</td>
+                    <td>${tag.name}</td>
                     <td>
-                        <a href="${category_form}/${category.id}" class="btn btn-primary">Sửa</a>
+                        <a href="${tag_form}/${tag.id}" class="btn btn-primary">Sửa</a>
 
-                        <c:url value="/categories/${category.id}" var="endpoint" />
-                        <button onclick="deleteItem('${endpoint}', ${category.id}, 'category')" class="btn btn-danger">Xóa</button>
+                        <c:url value="/tags/${tag.id}" var="endpoint" />
+                        <button onclick="deleteItem('${endpoint}', ${tag.id}, 'tag')" class="btn btn-danger">Xóa</button>
                     </td>
                 </tr>
             </c:forEach>

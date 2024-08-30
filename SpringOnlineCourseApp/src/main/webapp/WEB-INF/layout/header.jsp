@@ -11,6 +11,7 @@
 <c:url value="/" var="home"/>
 <c:url value="/logout" var="logout"/>
 <c:url value="/categories/list" var="categories_list"/>
+<c:url value="/tags/list" var="tags_list"/>
 <c:url value="/courses/list" var="course_list"/>
 <c:url value="/users/list" var="user_list"/>
 
@@ -24,6 +25,9 @@
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="${categories_list}">Danh mục</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="${tags_list}">Từ khóa</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="${course_list}">Khóa học</a>

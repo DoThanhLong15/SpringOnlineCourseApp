@@ -4,10 +4,9 @@
  */
 package com.dtl.repository.impl;
 
-import com.dtl.pojo.Category;
-import com.dtl.repository.CategoryRepository;
+import com.dtl.pojo.Tag;
+import com.dtl.repository.TagRepository;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityNotFoundException;
@@ -28,18 +27,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class CategoryRepositoryImpl implements CategoryRepository {
+public class TagRepositoryImpl implements TagRepository {
 
-    private int countCategory;
+    private int countTags;
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Category> getCategories(Map<String, String> params, int pageSize) {
+    public List<Tag> getTags(Map<String, String> params, int pageSize) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<Category> q = b.createQuery(Category.class);
-        Root root = q.from(Category.class);
+        CriteriaQuery<Tag> q = b.createQuery(Tag.class);
+        Root root = q.from(Tag.class);
         q.select(root);
 
         if (params != null) {
@@ -56,7 +55,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
         Query query = s.createQuery(q);
 
-        countCategory = query.getResultList().size();
+        countTags = query.getResultList().size();
 
         if (params != null) {
             String page = params.get("page") != null && !params.get("page").isEmpty() ? params.get("page") : "1";
@@ -72,38 +71,39 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public void addOrUpdateCourse(Category category) {
+    public void saveTag(Tag tag) {
         Session s = this.factory.getObject().getCurrentSession();
-        if (category.getId() != null) {
-            s.update(category);
+        if (tag.getId() != null) {
+            s.update(tag);
         } else {
-            s.save(category);
+            s.save(tag);
         }
     }
 
     @Override
-    public long countCategories() {
-        return this.countCategory;
+    public int countTags() {
+        return this.countTags;
     }
 
     @Override
-    public void deleteCategory(int id) {
+    public void deleteTag(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        Category category = this.getCategoryById(id);
+        Tag tag = this.getTagById(id);
 
-        s.delete(category);
+        s.delete(tag);
     }
 
     @Override
-    public Category getCategoryById(int id) {
+    public Tag getTagById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
 
-        Category category = s.get(Category.class, id);
+        Tag tag = s.get(Tag.class, id);
 
-        if (category == null) {
-            throw new EntityNotFoundException("Không tìm thấy category: " + id);
+        if (tag == null) {
+            throw new EntityNotFoundException("Không tìm thấy thẻ: " + id);
         }
 
-        return category;
+        return tag;
     }
+
 }

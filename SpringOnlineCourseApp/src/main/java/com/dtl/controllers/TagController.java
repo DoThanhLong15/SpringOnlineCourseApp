@@ -4,8 +4,8 @@
  */
 package com.dtl.controllers;
 
-import com.dtl.pojo.Category;
-import com.dtl.services.CategoryService;
+import com.dtl.pojo.Tag;
+import com.dtl.services.TagService;
 import java.util.Map;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -30,60 +30,59 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author LONG
  */
 @Controller
-@RequestMapping("/categories")
-public class CategoryController {
+@RequestMapping("tags")
+public class TagController {
 
     @Autowired
-    private CategoryService cateService;
+    private TagService tagService;
 
     @GetMapping("/list")
     public String categoryList(Model model, @RequestParam Map<String, String> params) {
-        int pageSize = this.cateService.getPageSize();
+        model.addAttribute("tags", this.tagService.getTags(params));
 
-        model.addAttribute("categories", this.cateService.getCategories(params));
-
-        long totalCategories = this.cateService.countCategories();
-        int totalPages = (int) Math.ceil((double) totalCategories / pageSize);
+        int pageSize = this.tagService.getPageSize();
+        long totalTags = this.tagService.countTags();
+        int totalPages = (int) Math.ceil((double) totalTags / pageSize);
 
         model.addAttribute("q", params.get("q") != null ? params.get("q") : null);
         model.addAttribute("currentPage", params.get("page") != null ? params.get("page") : 1);
         model.addAttribute("totalPages", totalPages);
 
-        return "categoryList";
+        return "tagList";
     }
 
     @GetMapping("/form")
     public String categoryForm(Model model) {
-        model.addAttribute("category", new Category());
+        model.addAttribute("tag", new Tag());
 
-        return "categoryForm";
+        return "tagForm";
     }
 
-    @GetMapping("/form/{cateId}")
-    public String categoryForm(Model model, @PathVariable(value = "cateId") int id) {
-        model.addAttribute("category", this.cateService.getCategoryById(id));
+    @GetMapping("/form/{tagId}")
+    public String categoryForm(Model model, @PathVariable(value = "tagId") int id) {
+        model.addAttribute("tag", this.tagService.getTagById(id));
 
-        return "categoryForm";
+        return "tagForm";
     }
 
     @PostMapping("/form/save")
-    public String categorySave(Model model, @ModelAttribute(value = "category") @Valid Category category,
+    public String categorySave(Model model, @ModelAttribute(value = "tag") @Valid Tag tag,
             BindingResult rs) {
 
         if (rs.hasErrors()) {
 
-            return "categoryForm";
+            return "tagForm";
         }
 
         try {
-            this.cateService.addOrUpdateCourse(category);
+            this.tagService.saveTag(tag);
 
-            return "redirect:/categories/list";
+            return "redirect:/tags/list";
         } catch (Exception ex) {
             model.addAttribute("errMsg", ex.getMessage());
         }
 
-        return "categoryForm";
+        return "tagForm";
     }
 
     @DeleteMapping("/{id}")
@@ -92,7 +91,7 @@ public class CategoryController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         try {
-            this.cateService.deleteCategory(id);
+            this.tagService.deleteTag(id);
 
             return new ResponseEntity<>("Xóa thành công", headers, HttpStatus.OK);
         } catch (EntityNotFoundException ex) {
