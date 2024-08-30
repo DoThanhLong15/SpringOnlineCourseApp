@@ -4,7 +4,7 @@
  */
 package com.dtl.repository;
 
-import com.dtl.pojo.Category;
+import com.dtl.pojo.CourseTag;
 import java.util.List;
 import java.util.Map;
 
@@ -12,16 +12,9 @@ import java.util.Map;
  *
  * @author LONG
  */
+public interface CourseTagRepository {
 
-public interface CategoryRepository {
-
-    List<Category> getCategories(Map<String, String> params, int pageSize);
+    List<CourseTag> getCourseTags(int courseId, int tagId);
     
-    void addOrUpdateCourse(Category category);
-    
-    long countCategories();
-    
-    void deleteCategory(int id);
-    
-    Category getCategoryById(int id);
+    boolean hasCourseTag(int courseId, int tagId);
 }

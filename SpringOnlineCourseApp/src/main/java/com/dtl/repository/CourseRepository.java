@@ -13,8 +13,12 @@ import java.util.Map;
  * @author LONG
  */
 public interface CourseRepository {
+
     List<Course> getCourse(Map<String, String> params);
+
     void addOrUpdateCourse(Course course);
+
     Course getCourseById(int id);
+
     void deleteCourse(int id);
 }

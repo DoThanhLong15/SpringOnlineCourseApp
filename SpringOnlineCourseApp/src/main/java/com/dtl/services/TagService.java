@@ -4,7 +4,7 @@
  */
 package com.dtl.services;
 
-import com.dtl.pojo.Category;
+import com.dtl.pojo.Tag;
 import java.util.List;
 import java.util.Map;
 
@@ -12,18 +12,17 @@ import java.util.Map;
  *
  * @author LONG
  */
-public interface CategoryService {
+public interface TagService {
 
-    List<Category> getCategories(Map<String, String> params);
+    List<Tag> getTags(Map<String, String> params);
 
-    void addOrUpdateCourse(Category category);
+    void saveTag(Tag tag);
 
-    long countCategories();
+    int countTags();
+
+    void deleteTag(int id);
+
+    Tag getTagById(int id);
 
     int getPageSize();
-
-    void deleteCategory(int id);
-
-    Category getCategoryById(int id);
-
 }

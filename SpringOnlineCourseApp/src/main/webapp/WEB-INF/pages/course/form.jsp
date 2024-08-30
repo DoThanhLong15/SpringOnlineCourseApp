@@ -20,11 +20,11 @@
     <form:errors path="*" element="div" cssClass="alert alert-danger" />
 
     <div class="mb-3 mt-3">
-        <label for="name" class="form-label">Tên khóa học</label>
+        <label for="title" class="form-label">Tên khóa học</label>
         <form:input path="title" type="text" class="form-control" id="title" placeholder="Tên khóa học..." name="title" />
     </div>
     <div class="mb-3 mt-3">
-        <label for="name" class="form-label">Mô tả</label>
+        <label for="description" class="form-label">Mô tả</label>
         <form:textarea path="description" type="text" class="form-control" id="description" placeholder="Mô tả..." name="description" rows="4"/>
     </div>
     <div class="mb-3 mt-3">
@@ -39,7 +39,7 @@
         </c:if>
     </div>
     <div class="mb-3 mt-3">
-        <label for="browser" class="form-label">Danh mục</label>
+        <label class="form-label">Danh mục</label>
         <form:select class="form-select" path="categoryId" >
             <option disabled selected>Chọn danh mục</option>
             <c:forEach items="${categories}" var="category">
@@ -51,12 +51,11 @@
                         <option value="${category.id}">${category.name}</option>
                     </c:otherwise>
                 </c:choose>
-
             </c:forEach>
         </form:select>
     </div>
     <div class="mb-3 mt-3">
-        <label for="browser" class="form-label">Giảng viên</label>
+        <label class="form-label">Giảng viên</label>
         <form:select class="form-select" path="lecturerId" >
             <option disabled selected>Chọn giảng viên</option>
             <c:forEach items="${users}" var="user">
@@ -71,6 +70,12 @@
 
             </c:forEach>
         </form:select>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="tagInput">Từ khóa</label>
+        <div id="tagContainer" class="mb-2 flex"></div>
+        <input type="text" id="tagInput" class="form-control tag-input" placeholder="Tìm từ khóa">
+        <ul class="list-group" id="search-container"></ul>
     </div>
     <div class="mb-3 mt-3">
         <form:hidden path="id" />
@@ -92,3 +97,5 @@
         </button>
     </div>
 </form:form>
+
+<script src="<c:url value="/js/TagInput.js" />"></script>
