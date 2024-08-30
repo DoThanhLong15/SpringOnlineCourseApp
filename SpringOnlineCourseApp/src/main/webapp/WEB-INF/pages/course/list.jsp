@@ -8,8 +8,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 
-<c:url value="/course/list" var="course_list" />
-<c:url value="/course/form" var="course_form" />
+<c:url value="/courses/list" var="course_list" />
+<c:url value="/courses/form" var="course_form" />
 
 <h1 class="text-center text-primary mt-3">DANH SÁCH KHÓA HỌC</h1>
 <div class="row">

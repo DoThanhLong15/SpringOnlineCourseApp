@@ -10,8 +10,9 @@
 
 <c:url value="/" var="home"/>
 <c:url value="/logout" var="logout"/>
-<c:url value="/course/list" var="course_list"/>
-<c:url value="/user/list" var="user_list"/>
+<c:url value="/categories/list" var="categories_list"/>
+<c:url value="/courses/list" var="course_list"/>
+<c:url value="/users/list" var="user_list"/>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
@@ -22,7 +23,7 @@
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
-                    <a class="nav-link" href="">Danh mục</a>
+                    <a class="nav-link" href="${categories_list}">Danh mục</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="${course_list}">Khóa học</a>

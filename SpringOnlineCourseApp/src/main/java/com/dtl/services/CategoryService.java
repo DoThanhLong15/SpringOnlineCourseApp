@@ -6,13 +6,20 @@ package com.dtl.services;
 
 import com.dtl.pojo.Category;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author LONG
  */
-
 public interface CategoryService {
 
-    List<Category> getCategories();
+    List<Category> getCategories(Map<String, String> params);
+
+    void addOrUpdateCourse(Category category);
+    
+    long countCategories();
+    
+    int getPageSize();
+
 }

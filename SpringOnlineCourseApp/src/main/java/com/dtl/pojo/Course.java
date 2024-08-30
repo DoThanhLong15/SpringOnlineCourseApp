@@ -4,6 +4,7 @@
  */
 package com.dtl.pojo;
 
+import com.dtl.validation.annotation.CourseImageRequired;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -16,7 +17,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -30,6 +30,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -50,6 +54,9 @@ import org.springframework.web.multipart.MultipartFile;
     @NamedQuery(name = "Course.findByRating", query = "SELECT c FROM Course c WHERE c.rating = :rating"),
     @NamedQuery(name = "Course.findByPrice", query = "SELECT c FROM Course c WHERE c.price = :price"),
     @NamedQuery(name = "Course.findByStatus", query = "SELECT c FROM Course c WHERE c.status = :status")})
+@DynamicInsert
+@DynamicUpdate
+@CourseImageRequired(message = "{course.image.notNull.errMsg}")
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -59,19 +66,19 @@ public class Course implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 50, message = "{course.title.size.errMsg}")
     @Column(name = "title")
     private String title;
     @Basic(optional = false)
     @NotNull
-    @Lob
-    @Size(min = 1, max = 65535)
+    @Size(min = 1, max = 65535, message = "{course.description.notnull.errMsg}")
     @Column(name = "description")
     private String description;
-    @Column(name = "created_date")
+    @CreationTimestamp
+    @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
+    @UpdateTimestamp
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
@@ -79,17 +86,16 @@ public class Course implements Serializable {
     private Integer participantCount;
     @Column(name = "rating_count")
     private Integer ratingCount;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Min(value =  0)
     @Column(name = "rating")
     private BigDecimal rating;
     @Basic(optional = false)
-    @NotNull
-    @Min(value = 0)
+    @NotNull(message = "{course.price.notNull.errMsg}")
+    @Min(value = 0, message = "{course.price.min.errMsg}")
     @Column(name = "price")
     private int price;
     @Column(name = "status")
     private Boolean status;
-    @NotNull
     @Column(name = "image")
     private String image;
     @Transient
@@ -107,9 +113,10 @@ public class Course implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     private Collection<Cart> cartCollection;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-    @NotNull
+    @NotNull(message = "{course.categoryId.notNull.errMsg}")
     @ManyToOne
     private Category categoryId;
+    @NotNull(message = "{course.lecturerId.notNull.errMsg}")
     @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
     @ManyToOne
     private User lecturerId;
@@ -330,5 +337,5 @@ public class Course implements Serializable {
     public void setFile(MultipartFile file) {
         this.file = file;
     }
-    
+
 }

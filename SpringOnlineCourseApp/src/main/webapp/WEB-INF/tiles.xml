@@ -12,10 +12,21 @@ Software Foundation//DTD Tiles Configuration 3.0//EN"
         <put-attribute name="footer"
                        value="/WEB-INF/layout/footer.jsp" />
     </definition>
+    <!-- HOME -->
     <definition name="home" extends="baseLayout">
         <put-attribute name="title" value="Trang chủ" />
         <put-attribute name="content" value="/WEB-INF/pages/home.jsp" />
     </definition>
+    <!-- CATEGORY -->
+     <definition name="categoryList" extends="baseLayout">
+        <put-attribute name="title" value="Danh mục" />
+        <put-attribute name="content" value="/WEB-INF/pages/category/list.jsp" />
+    </definition>
+    <definition name="categoryForm" extends="baseLayout">
+        <put-attribute name="title" value="Danh mục" />
+        <put-attribute name="content" value="/WEB-INF/pages/category/form.jsp" />
+    </definition>
+    <!-- COURSE -->
     <definition name="courseList" extends="baseLayout">
         <put-attribute name="title" value="Khóa học" />
         <put-attribute name="content" value="/WEB-INF/pages/course/list.jsp" />
@@ -24,6 +35,7 @@ Software Foundation//DTD Tiles Configuration 3.0//EN"
         <put-attribute name="title" value="Khóa học" />
         <put-attribute name="content" value="/WEB-INF/pages/course/form.jsp" />
     </definition>
+    <!-- USER -->
     <definition name="userList" extends="baseLayout">
         <put-attribute name="title" value="Người dùng" />
         <put-attribute name="content" value="/WEB-INF/pages/user/list.jsp" />

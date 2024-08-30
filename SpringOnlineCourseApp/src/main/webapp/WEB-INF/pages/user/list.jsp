@@ -8,10 +8,10 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 
-<c:url value="/user/list" var="user_list" />
-<c:url value="/user/form" var="user_form" />
+<c:url value="/users/list" var="user_list" />
+<c:url value="/users/form" var="user_form" />
 
-<h1 class="text-center text-primary mt-3">DANH SÁCH KHÁCH HÀNG</h1>
+<h1 class="text-center text-primary mt-3">DANH SÁCH NGƯỜI DÙNG</h1>
 <div class="row">
     <div class="col-md-2 col-12 bg-secondary">
         
@@ -46,7 +46,7 @@
                 <th></th>
             </tr>
             <c:forEach items="${users}" var="user">
-                <tr id="course${user.id}">
+                <tr id="user${user.id}">
                     <td>
                         <img src="${user.avatar}" width="120" />
                     </td>
