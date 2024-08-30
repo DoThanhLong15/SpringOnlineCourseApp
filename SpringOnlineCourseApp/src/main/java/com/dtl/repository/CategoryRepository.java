@@ -6,6 +6,7 @@ package com.dtl.repository;
 
 import com.dtl.pojo.Category;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -14,5 +15,9 @@ import java.util.List;
 
 public interface CategoryRepository {
 
-    List<Category> getCategories();
+    List<Category> getCategories(Map<String, String> params, int pageSize);
+    
+    void addOrUpdateCourse(Category category);
+    
+    long countCategories();
 }
