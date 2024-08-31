@@ -1,57 +1,72 @@
+const tagInput = document.getElementById('tagInput');
+const tagContainer = document.getElementById('tagContainer');
+const searchContainer = document.getElementById('search-container');
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
-    const tagInput = document.getElementById('tagInput');
-    const tagContainer = document.getElementById('tagContainer');
-    const searchContainer = document.getElementById('search-container');
-
-    tagInput.addEventListener('keydown', (event) => {
-        let data = tagSearch(tagInput.value);
-    });
-
-    // Optional: Allow removing tags by clicking on them
-    tagContainer.addEventListener('click', (event) => {
-        if (event.target.classList.contains('tag')) {
-            event.target.remove();
+    tagInput.addEventListener('keydown', async (event) => {
+        let data = await tagSearch(tagInput.value);
+        if (data !== null && data !== []) {
+            renderList(data);
         }
     });
 });
 
 
 const tagSearch = async (kw) => {
+    let url = `http://localhost:8080/SpringOnlineCourseApp/api/tags/?q=${kw}`;
+
     try {
-        const response = await fetch(`/api/tags/?q=${kw}`);
-        const data = await response.json();
-        return data; // Adjust based on your API response format
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        const json = await response.json();
+
+        return json;
     } catch (error) {
-        console.error('Error fetching tags:', error);
+        console.error(error.message);
         return [];
     }
 };
 
 const renderList = (items) => {
-//    list.innerHTML = ''; // Clear the list
-//    items.forEach(item => {
-//        const listItem = document.createElement('li');
-//        listItem.className = 'list-group-item';
-//        listItem.textContent = item;
-//        list.appendChild(listItem);
-//    });
+    searchContainer.innerHTML = ''; // Clear the list
+    items.forEach(item => {
+        searchContainer.innerHTML += `
+            <li class="list-group-item" id="tag-${item.id}" 
+                onClick="addTag('${item.id}','${item.name}')">
+                    ${item.name}
+            </li>
+        `;
+    });
 };
 
-const addTag = (tag, tagContainer, tagInput) => {
+const addTag = (id, tag) => {
     if (tag.trim() === '')
         return;
 
     const tagElement = document.createElement('span');
-    tagElement.classList.add('tag');
+    tagElement.classList.add(`tag-${id}`);
+    tagElement.classList.add(`tag`);
     tagElement.textContent = tag;
 
     const removeButton = document.createElement('span');
     removeButton.classList.add('remove-tag');
     removeButton.textContent = 'x';
-    removeButton.onclick = () => tagElement.remove();
+    removeButton.onclick = () => {
+        let courseTag = document.getElementsByClassName(`tag-${id}`);
+
+        while (courseTag.length > 0) {
+            courseTag[0].remove();
+        }
+    };
 
     tagElement.appendChild(removeButton);
     tagContainer.appendChild(tagElement);
-    tagInput.value = ''; // Clear input field
+    addTagForm(id, tag);
+
+    tagInput.value = '';
+    searchContainer.innerHTML = '';
 };

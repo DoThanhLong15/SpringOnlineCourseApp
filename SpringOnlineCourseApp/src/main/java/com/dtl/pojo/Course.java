@@ -4,11 +4,13 @@
  */
 package com.dtl.pojo;
 
+import com.dtl.DTO.CourseTagForm;
 import com.dtl.validation.annotation.CourseImageRequired;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -101,17 +103,17 @@ public class Course implements Serializable {
     @Transient
     private MultipartFile file;
     @OneToMany(mappedBy = "courseId")
-    private Collection<RegisterDetail> registerDetailCollection;
+    private List<RegisterDetail> registerDetailCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
-    private Collection<CourseProgress> courseProgressCollection;
+    private List<CourseProgress> courseProgressCollection;
     @OneToMany(mappedBy = "courseId")
-    private Collection<CourseRating> courseRatingCollection;
+    private List<CourseRating> courseRatingCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
-    private Collection<Lesson> lessonCollection;
+    private List<Lesson> lessonCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
-    private Collection<CourseTag> courseTagCollection;
+    private List<CourseTag> courseTagCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
-    private Collection<Cart> cartCollection;
+    private List<Cart> cartCollection;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @NotNull(message = "{course.categoryId.notNull.errMsg}")
     @ManyToOne
@@ -120,6 +122,9 @@ public class Course implements Serializable {
     @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
     @ManyToOne
     private User lecturerId;
+    
+    @Transient
+    private List<CourseTagForm> courseTagForm;
 
     public Course() {
     }
@@ -216,56 +221,56 @@ public class Course implements Serializable {
     }
 
     @XmlTransient
-    public Collection<RegisterDetail> getRegisterDetailCollection() {
+    public List<RegisterDetail> getRegisterDetailCollection() {
         return registerDetailCollection;
     }
 
-    public void setRegisterDetailCollection(Collection<RegisterDetail> registerDetailCollection) {
+    public void setRegisterDetailCollection(List<RegisterDetail> registerDetailCollection) {
         this.registerDetailCollection = registerDetailCollection;
     }
 
     @XmlTransient
-    public Collection<CourseProgress> getCourseProgressCollection() {
+    public List<CourseProgress> getCourseProgressCollection() {
         return courseProgressCollection;
     }
 
-    public void setCourseProgressCollection(Collection<CourseProgress> courseProgressCollection) {
+    public void setCourseProgressCollection(List<CourseProgress> courseProgressCollection) {
         this.courseProgressCollection = courseProgressCollection;
     }
 
     @XmlTransient
-    public Collection<CourseRating> getCourseRatingCollection() {
+    public List<CourseRating> getCourseRatingCollection() {
         return courseRatingCollection;
     }
 
-    public void setCourseRatingCollection(Collection<CourseRating> courseRatingCollection) {
+    public void setCourseRatingCollection(List<CourseRating> courseRatingCollection) {
         this.courseRatingCollection = courseRatingCollection;
     }
 
     @XmlTransient
-    public Collection<Lesson> getLessonCollection() {
+    public List<Lesson> getLessonCollection() {
         return lessonCollection;
     }
 
-    public void setLessonCollection(Collection<Lesson> lessonCollection) {
+    public void setLessonCollection(List<Lesson> lessonCollection) {
         this.lessonCollection = lessonCollection;
     }
 
     @XmlTransient
-    public Collection<CourseTag> getCourseTagCollection() {
+    public List<CourseTag> getCourseTagCollection() {
         return courseTagCollection;
     }
 
-    public void setCourseTagCollection(Collection<CourseTag> courseTagCollection) {
+    public void setCourseTagCollection(List<CourseTag> courseTagCollection) {
         this.courseTagCollection = courseTagCollection;
     }
 
     @XmlTransient
-    public Collection<Cart> getCartCollection() {
+    public List<Cart> getCartCollection() {
         return cartCollection;
     }
 
-    public void setCartCollection(Collection<Cart> cartCollection) {
+    public void setCartCollection(List<Cart> cartCollection) {
         this.cartCollection = cartCollection;
     }
 
@@ -336,6 +341,20 @@ public class Course implements Serializable {
      */
     public void setFile(MultipartFile file) {
         this.file = file;
+    }
+
+    /**
+     * @return the courseTagForm
+     */
+    public List<CourseTagForm> getCourseTagForm() {
+        return courseTagForm;
+    }
+
+    /**
+     * @param courseTagForm the courseTagForm to set
+     */
+    public void setCourseTagForm(List<CourseTagForm> courseTagForm) {
+        this.courseTagForm = courseTagForm;
     }
 
 }

@@ -32,8 +32,6 @@ public class ApiTagController {
     public ResponseEntity<List<Tag>> list(@RequestParam Map<String, String> params) {
         List<Tag> tags = this.tagService.getTags(params);
         
-//        System.out.println(tags.get(0).getCourseTagCollection());
-        
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 }
