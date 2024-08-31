@@ -74,8 +74,11 @@
     <div class="mb-3 mt-3">
         <label for="tagInput">Từ khóa</label>
         <div id="tagContainer" class="mb-2 flex"></div>
+
+        <div class="tagFormContainer"></div>
+
         <input type="text" id="tagInput" class="form-control tag-input" placeholder="Tìm từ khóa">
-        <ul class="list-group" id="search-container"></ul>
+        <ul class="list-group mt-1" id="search-container"></ul>
     </div>
     <div class="mb-3 mt-3">
         <form:hidden path="id" />
@@ -98,4 +101,32 @@
     </div>
 </form:form>
 
+<script>
+    let tagIndex = '${course.courseTagForm.size()}' === '0' ? 0 : parseInt('${course.courseTagForm.size()}');
+    let tagFormContainer = document.getElementsByClassName("tagFormContainer")[0];
+
+    const addTagForm = (id, tagName) => {
+
+        const container = document.createElement('div');
+        container.setAttribute('class', 'tag-' + id);
+
+        const tagIdInput = document.createElement('input');
+        tagIdInput.setAttribute('type', 'number');
+        tagIdInput.setAttribute('name', 'courseTagForm[' + tagIndex + '].tagId');
+        tagIdInput.setAttribute('value', id);
+
+        const courseIdInput = document.createElement('input');
+        let courseId = '${course.id}' === '' ? null: '${course.id}';
+        courseIdInput.setAttribute('type', 'number');
+        courseIdInput.setAttribute('name', 'courseTagForm[' + tagIndex + '].courseId');
+        courseIdInput.setAttribute('value', courseId);
+
+        container.appendChild(tagIdInput);
+        container.appendChild(courseIdInput);
+
+        document.querySelector('form').appendChild(container);
+
+        tagIndex++;
+    };
+</script>
 <script src="<c:url value="/js/TagInput.js" />"></script>

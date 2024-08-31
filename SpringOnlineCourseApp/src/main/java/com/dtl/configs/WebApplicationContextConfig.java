@@ -4,10 +4,11 @@
  */
 package com.dtl.configs;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.dtl.formatters.CategoryFormatter;
+import com.dtl.formatters.CourseTagFormatter;
 import com.dtl.formatters.DateFormatter;
+import com.dtl.formatters.TagFormatter;
+import com.dtl.formatters.UserFormatter;
 import com.dtl.formatters.UserRoleFormatter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -82,6 +83,9 @@ public class WebApplicationContextConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
+        registry.addFormatter(new UserFormatter());
+        registry.addFormatter(new CourseTagFormatter());
+        registry.addFormatter(new TagFormatter());
         registry.addFormatter(new CategoryFormatter());
         registry.addFormatter(new UserRoleFormatter());
         registry.addFormatter(new DateFormatter());
