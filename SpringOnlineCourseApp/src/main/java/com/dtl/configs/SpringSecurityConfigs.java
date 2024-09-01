@@ -29,7 +29,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan(basePackages = {
     "com.dtl.controllers",
     "com.dtl.services",
-    "com.dtl.repository"
+    "com.dtl.repository",
+    "com.dtl.components"
 })
 @Order(2)
 public class SpringSecurityConfigs extends WebSecurityConfigurerAdapter {
@@ -53,13 +54,12 @@ public class SpringSecurityConfigs extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.formLogin().usernameParameter("username").passwordParameter("password");
         http.formLogin().defaultSuccessUrl("/").failureUrl("/login?error");
-        
+
         http.logout().logoutSuccessUrl("/login");
-        
+
         http.exceptionHandling().accessDeniedPage("/login?accessDenied");
-        
+
         http.authorizeRequests()
-                .antMatchers("/api/**").permitAll()
                 .antMatchers("/**").hasRole("ADMIN");
 
         http.csrf().disable();

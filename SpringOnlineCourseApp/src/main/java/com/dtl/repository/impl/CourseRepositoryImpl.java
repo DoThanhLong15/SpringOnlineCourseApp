@@ -9,6 +9,7 @@ import com.dtl.repository.CourseRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -106,6 +107,10 @@ public class CourseRepositoryImpl implements CourseRepository{
     public void deleteCourse(int id) {
         Session s = this.factory.getObject().getCurrentSession();
         Course course = this.getCourseById(id);
+        
+        if (course == null) {
+            throw new EntityNotFoundException("Không tìm thấy khóa học: " + id);
+        }
         s.delete(course); 
     }
 }

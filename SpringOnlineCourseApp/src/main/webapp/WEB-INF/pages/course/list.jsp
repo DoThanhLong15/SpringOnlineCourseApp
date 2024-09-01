@@ -54,7 +54,7 @@
                 <th></th>
             </tr>
             <c:forEach items="${courses}" var="course">
-                <tr id="course${course.id}">
+                <tr id="course-${course.id}">
                     <td>
                         <img src="${course.image}" width="120" />
                     </td>
@@ -71,12 +71,15 @@
                     </c:choose>
                     
                     <td>
-                        <a href="" class="btn btn-primary">Sửa</a>
+                        <a href="${course_form}/${course.id}" class="btn btn-primary">Sửa</a>
 
-                        <button class="btn btn-warning">Xóa</button>
+                        <c:url value="/courses/${course.id}" var="endpoint" />
+                        <button onclick="deleteItem('${endpoint}', ${course.id}, 'course')" class="btn btn-danger">Xóa</button>
                     </td>
                 </tr>
             </c:forEach>
         </table>
     </div>
 </div>
+        
+<script src="<c:url value="/js/Utils.js" />"></script>

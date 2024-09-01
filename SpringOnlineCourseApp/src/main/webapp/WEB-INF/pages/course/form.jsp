@@ -73,9 +73,22 @@
     </div>
     <div class="mb-3 mt-3">
         <label for="tagInput">Từ khóa</label>
-        <div id="tagContainer" class="mb-2 flex"></div>
+        <div id="tagContainer" class="mb-2 flex">
+            <c:forEach items="${course.courseTagForm}" varStatus="status">
+                <form:hidden path="courseTagForm[${status.index}].tagId"/>
+            </c:forEach>
+        </div>
 
-        <div class="tagFormContainer"></div>
+        <div class="tagFormContainer">
+            <c:forEach items="${course.courseTagCollection}" varStatus="status" var="courseTag">
+                <div>
+                    <label class="tag">${courseTag.tagId.name}</label>
+                    <form:hidden path="courseTagCollection[${status.index}].id"/>
+                    <form:hidden path="courseTagCollection[${status.index}].courseId.id"/>
+                    <form:hidden path="courseTagCollection[${status.index}].tagId"/>
+                </div>
+            </c:forEach>
+        </div>
 
         <input type="text" id="tagInput" class="form-control tag-input" placeholder="Tìm từ khóa">
         <ul class="list-group mt-1" id="search-container"></ul>
@@ -91,10 +104,10 @@
         <button class="btn btn-success" type="submit">
             <c:choose>
                 <c:when test="${course.id != null}">
-                    Cập nhật sản phẩm
+                    Cập nhật
                 </c:when>
                 <c:otherwise>
-                    Thêm sản phẩm
+                    Thêm
                 </c:otherwise>
             </c:choose>
         </button>
@@ -111,20 +124,14 @@
         container.setAttribute('class', 'tag-' + id);
 
         const tagIdInput = document.createElement('input');
-        tagIdInput.setAttribute('type', 'number');
+        tagIdInput.setAttribute('type', 'text');
         tagIdInput.setAttribute('name', 'courseTagForm[' + tagIndex + '].tagId');
         tagIdInput.setAttribute('value', id);
-
-        const courseIdInput = document.createElement('input');
-        let courseId = '${course.id}' === '' ? null: '${course.id}';
-        courseIdInput.setAttribute('type', 'number');
-        courseIdInput.setAttribute('name', 'courseTagForm[' + tagIndex + '].courseId');
-        courseIdInput.setAttribute('value', courseId);
+        tagIdInput.setAttribute('hidden', true);
 
         container.appendChild(tagIdInput);
-        container.appendChild(courseIdInput);
 
-        document.querySelector('form').appendChild(container);
+        document.querySelector('.tagFormContainer').appendChild(container);
 
         tagIndex++;
     };

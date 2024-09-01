@@ -12,5 +12,8 @@ import java.util.List;
  * @author LONG
  */
 public interface UserRoleService {
+
     List<UserRole> getUserRoles();
+
+    UserRole getUserRoleById(int id);
 }

@@ -22,4 +22,6 @@ public interface UserService extends UserDetailsService {
     void addOrUpdateUser(User user);
 
     User getUserById(int id);
+    
+    boolean authUser(String username, String password);
 }

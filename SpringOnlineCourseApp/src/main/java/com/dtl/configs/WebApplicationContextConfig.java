@@ -36,7 +36,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = {
     "com.dtl.controllers",
     "com.dtl.services",
-    "com.dtl.repository"
+    "com.dtl.repository",
+    "com.dtl.components"
 })
 @Order(1)
 public class WebApplicationContextConfig implements WebMvcConfigurer {

@@ -34,8 +34,6 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserRoleService userRoleService;
-//    @Autowired
-//    private MessageSource messageSource;
 
     @ModelAttribute
     public void commonAttribure(Model model) {
@@ -63,7 +61,7 @@ public class UserController {
         return "userForm";
     }
 
-    @PostMapping("/form")
+    @PostMapping("/form/save")
     public String userForm(Model model, @ModelAttribute(value = "user") @Valid User user,
             BindingResult rs) {
         if (rs.hasErrors()) {
@@ -71,9 +69,6 @@ public class UserController {
         }
 
         try {
-//            if(user.getUserRoleId().getId() == 1) {
-//                throw new Exception(messageSource.getMessage("userRole.role.admin", null, Locale.ROOT));
-//            }
             this.userService.addOrUpdateUser(user);
             
             return "redirect:/user/list";
