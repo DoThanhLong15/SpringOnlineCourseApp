@@ -5,25 +5,27 @@
 package com.dtl.validation.validator;
 
 import com.dtl.pojo.Course;
-import com.dtl.validation.annotation.CourseImageRequired;
+import com.dtl.validation.annotation.CourseTagRequired;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
 
 /**
  *
  * @author LONG
  */
-public class CourseImageRequiredValidator implements ConstraintValidator<CourseImageRequired, Course>  {
+
+public class CourseTagRequiredValidator implements ConstraintValidator<CourseTagRequired, Course> {
 
     @Override
-    public void initialize(CourseImageRequired constraintAnnotation) {
+    public void initialize(CourseTagRequired constraintAnnotation) {
         
     }
 
     @Override
     public boolean isValid(Course course, ConstraintValidatorContext context) {
-        
-        if (course.getId() == null && (course.getFile() == null || course.getFile().isEmpty())) {
+        if ((course.getCourseTagCollection() == null || course.getCourseTagCollection().isEmpty()) && 
+                (course.getCourseTagForm() == null || course.getCourseTagForm().isEmpty() )) {
             return false;
         }
         

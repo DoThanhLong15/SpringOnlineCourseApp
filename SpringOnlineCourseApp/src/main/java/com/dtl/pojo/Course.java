@@ -6,6 +6,7 @@ package com.dtl.pojo;
 
 import com.dtl.DTO.CourseTagForm;
 import com.dtl.validation.annotation.CourseImageRequired;
+import com.dtl.validation.annotation.CourseTagRequired;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -59,6 +60,7 @@ import org.springframework.web.multipart.MultipartFile;
 @DynamicInsert
 @DynamicUpdate
 @CourseImageRequired(message = "{course.image.notNull.errMsg}")
+@CourseTagRequired(message = "{course.courseTag.notNull.errMsg}")
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -104,7 +106,7 @@ public class Course implements Serializable {
     private MultipartFile file;
     @OneToMany(mappedBy = "courseId")
     private List<RegisterDetail> registerDetailCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "courseId", orphanRemoval = false)
     private List<CourseProgress> courseProgressCollection;
     @OneToMany(mappedBy = "courseId")
     private List<CourseRating> courseRatingCollection;

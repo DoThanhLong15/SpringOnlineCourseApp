@@ -7,9 +7,13 @@ package com.dtl.services.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.dtl.pojo.Course;
+import com.dtl.pojo.CourseTag;
 import com.dtl.repository.CourseRepository;
+import com.dtl.repository.CourseTagRepository;
+import com.dtl.repository.TagRepository;
 import com.dtl.services.CourseService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -27,6 +31,10 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseRepository courseRepo;
     @Autowired
+    private TagRepository tagRepo;
+    @Autowired
+    private CourseTagRepository courseTagRepo;
+    @Autowired
     private Cloudinary cloudinary;
 
     @Override
@@ -39,19 +47,37 @@ public class CourseServiceImpl implements CourseService {
         if (!course.getFile().isEmpty()) {
             try {
                 Map res = this.cloudinary.uploader().upload(course.getFile().getBytes(),
-                            ObjectUtils.asMap("resource_type", "auto"));
-                
+                        ObjectUtils.asMap("resource_type", "auto"));
+
                 course.setImage(res.get("secure_url").toString());
             } catch (IOException ex) {
                 Logger.getLogger(CourseServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
+        if (course.getCourseTagForm() != null && !course.getCourseTagForm().isEmpty()) {
+            course.setCourseTagCollection(new ArrayList<>());
+
+            course.getCourseTagForm().stream()
+                    .forEach(formValue -> {
+                        CourseTag courseTag = new CourseTag();
+                        courseTag.setCourseId(course);
+                        courseTag.setTagId(this.tagRepo.getTagById(formValue.getTagId()));
+
+                        course.getCourseTagCollection().add(courseTag);
+                    });
+        }
+
         this.courseRepo.addOrUpdateCourse(course);
     }
 
     @Override
     public Course getCourseById(int id) {
-        return this.courseRepo.getCourseById(id);
+        Course course = this.courseRepo.getCourseById(id);
+
+        course.setCourseTagCollection(this.courseTagRepo.getCourseTags(id, -1));
+
+        return course;
     }
 
     @Override

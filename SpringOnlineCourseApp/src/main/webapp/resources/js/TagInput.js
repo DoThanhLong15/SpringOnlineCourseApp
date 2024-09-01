@@ -5,7 +5,7 @@ const searchContainer = document.getElementById('search-container');
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    tagInput.addEventListener('keydown', async (event) => {
+    tagInput.addEventListener('keyup', async (event) => {
         let data = await tagSearch(tagInput.value);
         if (data !== null && data !== []) {
             renderList(data);

@@ -81,7 +81,7 @@ public class User implements Serializable {
     @Basic(optional = false)
     @Column(name = "avatar")
     private String avatar;
-    @NotNull(message = "{user.avatar.notValid.errMsg}")
+//    @NotNull(message = "{user.avatar.notValid.errMsg}")
     @Transient
     private MultipartFile file;
     @Column(name = "created_date")

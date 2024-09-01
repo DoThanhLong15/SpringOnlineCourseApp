@@ -9,6 +9,7 @@ import com.dtl.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -38,7 +39,11 @@ public class UserRepositoryImpl implements UserRepository {
         Query q = s.createNamedQuery("User.findByUsername");
         q.setParameter("username", username);
 
-        return (User) q.getSingleResult();
+        try {
+            return (User) q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override

@@ -10,13 +10,20 @@ import com.dtl.services.CourseService;
 import com.dtl.services.UserService;
 import java.util.ArrayList;
 import java.util.Map;
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,13 +61,21 @@ public class CourseController {
 
         return "courseForm";
     }
+    
+    @GetMapping("/form/{courseId}")
+    public String courseForm(Model model, @PathVariable(value = "courseId") int id) {
+        Course course = this.courseService.getCourseById(id);
+        course.setCourseTagForm(new ArrayList<>());
+        model.addAttribute("course", course);
+
+        populateModelForCourseForm(model);
+
+        return "courseForm";
+    }
 
     @PostMapping("/form/save")
     public String courseSave(Model model, @ModelAttribute(value = "course") @Valid Course course,
             BindingResult rs) {
-
-        System.out.println(course.getCourseTagForm().get(0).getCourseId());
-        System.out.println(course.getCourseTagForm().get(0).getTagId());
 
         if (rs.hasErrors()) {
             populateModelForCourseForm(model);
@@ -69,7 +84,7 @@ public class CourseController {
         }
 
         try {
-//            this.courseService.addOrUpdateCourse(course);
+            this.courseService.addOrUpdateCourse(course);
 
             return "redirect:/courses/list";
         } catch (Exception ex) {
@@ -85,5 +100,21 @@ public class CourseController {
         model.addAttribute("categories", this.categoryService.getCategories(null));
         model.addAttribute("users", this.userService.getUsers(null).stream()
                 .filter(user -> "ROLE_LECTURER".equals(user.getUserRoleId().getRole())).toArray());
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable("id") int id) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        try {
+            this.courseService.deleteCourse(id);
+
+            return new ResponseEntity<>("Xóa thành công", headers, HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), headers, HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(ex.getMessage(), headers, HttpStatus.BAD_REQUEST);
+        }
     }
 }
