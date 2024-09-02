@@ -4,19 +4,18 @@
  */
 package com.dtl.repository;
 
-import com.dtl.pojo.Lesson;
+import com.dtl.pojo.LessonContent;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author LONG
  */
-public interface LessonRepository {
+public interface LessonContentRepository {
 
-    List<Lesson> getLessons(Map<String, String> params);
+    List<LessonContent> getLessonContent(int lessonId);
 
-    Lesson getLessonById(int id);
-
-    void saveLesson(Lesson lesson);
+    LessonContent getLessonContentById(int id);
+    
+    void saveLessonContent(LessonContent lessonContent);
 }

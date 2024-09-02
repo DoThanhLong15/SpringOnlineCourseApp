@@ -10,10 +10,12 @@ import com.dtl.pojo.Course;
 import com.dtl.pojo.CourseTag;
 import com.dtl.repository.CourseRepository;
 import com.dtl.repository.CourseTagRepository;
+import com.dtl.repository.LessonRepository;
 import com.dtl.repository.TagRepository;
 import com.dtl.services.CourseService;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -35,6 +37,8 @@ public class CourseServiceImpl implements CourseService {
     private TagRepository tagRepo;
     @Autowired
     private CourseTagRepository courseTagRepo;
+    @Autowired
+    private LessonRepository lessonRepo;
     @Autowired
     private Cloudinary cloudinary;
 
@@ -75,7 +79,11 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course getCourseById(int id) {
         Course course = this.courseRepo.getCourseById(id);
-
+        
+        Map<String, String> params = new HashMap<>();
+        params.put("courseId", String.valueOf(course.getId()));
+        course.setLessonCollection(this.lessonRepo.getLessons(params));
+        
         course.setCourseTagCollection(this.courseTagRepo.getCourseTags(id, -1));
 
         return course;

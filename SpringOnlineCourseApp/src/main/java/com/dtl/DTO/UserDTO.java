@@ -4,6 +4,8 @@
  */
 package com.dtl.DTO;
 
+import com.dtl.pojo.User;
+
 /**
  *
  * @author LONG
@@ -17,6 +19,13 @@ public class UserDTO {
 
     public UserDTO() {
 
+    }
+    
+    public UserDTO(User user) {
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.avatar = user.getAvatar();
     }
 
     public UserDTO(int id, String firstName, String lastName, String avatar) {

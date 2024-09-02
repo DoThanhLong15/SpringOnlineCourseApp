@@ -5,6 +5,7 @@
 package com.dtl.configs;
 
 import com.dtl.formatters.CategoryFormatter;
+import com.dtl.formatters.CourseFomatter;
 import com.dtl.formatters.CourseTagFormatter;
 import com.dtl.formatters.DateFormatter;
 import com.dtl.formatters.TagFormatter;
@@ -84,6 +85,7 @@ public class WebApplicationContextConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
+        registry.addFormatter(new CourseFomatter());
         registry.addFormatter(new UserFormatter());
         registry.addFormatter(new CourseTagFormatter());
         registry.addFormatter(new TagFormatter());

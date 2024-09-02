@@ -17,6 +17,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -118,16 +119,16 @@ public class Course implements Serializable {
     private List<Lesson> lessonCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     private List<CourseTag> courseTagCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Cart> cartCollection;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @NotNull(message = "{course.categoryId.notNull.errMsg}")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Category categoryId;
     @NotNull(message = "{course.lecturerId.notNull.errMsg}")
     @JoinColumn(name = "lecturer_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User lecturerId;
     
     @Transient

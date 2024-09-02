@@ -4,6 +4,7 @@
  */
 package com.dtl.DTO;
 
+import com.dtl.pojo.Course;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -26,7 +27,7 @@ public class CourseListDTO {
         
     }
     
-    public CourseListDTO(CourseListDTO course){
+    public CourseListDTO(Course course){
         this.id = course.getId();
         this.title = course.getTitle();
         this.rating = course.getRating();
@@ -36,19 +37,6 @@ public class CourseListDTO {
         this.createdDate = course.getCreatedDate();
         this.updatedDate = course.getUpdatedDate();
         this.participantCount = course.getParticipantCount();
-    }
-    
-    public CourseListDTO(Integer id, String title, BigDecimal rating, int ratingCount, int price, String image, 
-            Date createdDate, Date updatedDate, int participantCount) {
-        this.id = id;
-        this.title = title;
-        this.rating = rating;
-        this.ratingCount = ratingCount;
-        this.price = price;
-        this.image = image;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
-        this.participantCount = participantCount;
     }
 
     /**

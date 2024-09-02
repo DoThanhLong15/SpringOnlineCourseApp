@@ -8,6 +8,7 @@ import com.dtl.pojo.Lesson;
 import com.dtl.repository.LessonRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -32,16 +33,30 @@ public class LessonRepositoryImpl implements LessonRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Lesson> getLessons(int courseId) {
+    public List<Lesson> getLessons(Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Lesson> q = b.createQuery(Lesson.class);
         Root root = q.from(Lesson.class);
         q.select(root);
 
-        Predicate predicate = b.equal(root.get("courseId"), courseId);
+        if (params != null) {
+            List<Predicate> predicates = new ArrayList<>();
 
-        q.where(predicate);
+            String title = params.get("title");
+            if (title != null && !title.isEmpty()) {
+                Predicate p = b.like(root.get("title"), String.format("%%%s%%", title));
+                predicates.add(p);
+            }
+
+            String courseId = params.get("courseId");
+            if (courseId != null && !courseId.isEmpty()) {
+                Predicate p = b.equal(root.get("courseId"), Integer.parseInt(courseId));
+                predicates.add(p);
+            }
+
+            q.where(predicates.toArray(Predicate[]::new));
+        }
 
         return s.createQuery(q).getResultList();
     }
@@ -57,5 +72,15 @@ public class LessonRepositoryImpl implements LessonRepository {
         }
 
         return lesson;
+    }
+
+    @Override
+    public void saveLesson(Lesson lesson) {  
+        Session s = this.factory.getObject().getCurrentSession();
+        if (lesson.getId() != null) {
+            s.update(lesson);
+        } else {
+            s.save(lesson);
+        }
     }
 }

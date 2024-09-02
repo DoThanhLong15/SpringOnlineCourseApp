@@ -73,6 +73,9 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
         
         http.authorizeRequests()
                 .antMatchers("/api/courses/**").permitAll();
+        
+        http.authorizeRequests()
+                .antMatchers("/api/lessons/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
 
         http.authorizeRequests().antMatchers("/api/users/**").permitAll();
 
