@@ -13,8 +13,16 @@ import java.util.Map;
  * @author LONG
  */
 public interface CourseService {
+
     List<Course> getCourse(Map<String, String> params);
+
     void addOrUpdateCourse(Course course);
+
     Course getCourseById(int id);
+
     void deleteCourse(int id);
+    
+    int countCourses();
+
+    public int getPageSize();
 }

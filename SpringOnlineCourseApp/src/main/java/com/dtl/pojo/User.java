@@ -4,6 +4,8 @@
  */
 package com.dtl.pojo;
 
+import com.dtl.validation.annotation.UserAvatarRequired;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -53,6 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
     @NamedQuery(name = "User.findByActive", query = "SELECT u FROM User u WHERE u.active = :active")})
 @DynamicInsert
 @DynamicUpdate
+@UserAvatarRequired(message = "{user.avatar.notValid.errMsg}")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -81,14 +84,16 @@ public class User implements Serializable {
     @Basic(optional = false)
     @Column(name = "avatar")
     private String avatar;
-//    @NotNull(message = "{user.avatar.notValid.errMsg}")
     @Transient
+    @JsonIgnore
     private MultipartFile file;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Date createdDate;
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Date updatedDate;
     @Basic(optional = false)
     @NotNull(message = "{user.username.notNull.errMsg}")
@@ -99,26 +104,36 @@ public class User implements Serializable {
     @NotNull(message = "{user.password.notNull.errMsg}")
     @Size(min = 1, max = 255, message = "{user.password.size.errMsg}")
     @Column(name = "password")
+    @JsonIgnore
     private String password;
     @Column(name = "active")
+    @JsonIgnore
     private Boolean active;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "learnerId")
+    @JsonIgnore
     private Collection<CourseProgress> courseProgressCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "learnerId")
+    @JsonIgnore
     private Collection<CourseRating> courseRatingCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "learnerId")
+    @JsonIgnore
     private Collection<Cart> cartCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "learnerId")
+    @JsonIgnore
     private Collection<RegisterOrder> registerOrderCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "learnerId")
+    @JsonIgnore
     private Collection<DoingExercise> doingExerciseCollection;
     @OneToMany(mappedBy = "lecturerId")
+    @JsonIgnore
     private Collection<Course> courseCollection;
 //    @NotNull(message = "{user.userRoleId.notNull.errMsg}")
     @JoinColumn(name = "user_role_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
+    @JsonIgnore
     private UserRole userRoleId;
     @Transient
+    @JsonIgnore
     private String oldPassword;
 
     public User() {

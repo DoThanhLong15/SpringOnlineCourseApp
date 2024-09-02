@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CourseServiceImpl implements CourseService {
 
+    private static final int PAGE_SIZE = 5;
     @Autowired
     private CourseRepository courseRepo;
     @Autowired
@@ -39,7 +40,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> getCourse(Map<String, String> params) {
-        return this.courseRepo.getCourse(params);
+        return this.courseRepo.getCourse(params, PAGE_SIZE);
     }
 
     @Override
@@ -83,5 +84,15 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void deleteCourse(int id) {
         this.courseRepo.deleteCourse(id);
+    }
+
+    @Override
+    public int countCourses() {
+        return this.courseRepo.countCourses();
+    }
+    
+    @Override
+    public int getPageSize(){
+        return CourseServiceImpl.PAGE_SIZE;
     }
 }

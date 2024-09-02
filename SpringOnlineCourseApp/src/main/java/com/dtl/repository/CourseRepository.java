@@ -14,11 +14,13 @@ import java.util.Map;
  */
 public interface CourseRepository {
 
-    List<Course> getCourse(Map<String, String> params);
+    List<Course> getCourse(Map<String, String> params, int pageSize);
 
     void addOrUpdateCourse(Course course);
 
     Course getCourseById(int id);
 
     void deleteCourse(int id);
+
+    int countCourses();
 }
