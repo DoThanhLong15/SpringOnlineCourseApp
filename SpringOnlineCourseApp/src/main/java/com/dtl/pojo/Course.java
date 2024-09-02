@@ -7,6 +7,7 @@ package com.dtl.pojo;
 import com.dtl.DTO.CourseTagForm;
 import com.dtl.validation.annotation.CourseImageRequired;
 import com.dtl.validation.annotation.CourseTagRequired;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -103,18 +104,22 @@ public class Course implements Serializable {
     @Column(name = "image")
     private String image;
     @Transient
+    @JsonIgnore
     private MultipartFile file;
     @OneToMany(mappedBy = "courseId")
     private List<RegisterDetail> registerDetailCollection;
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "courseId", orphanRemoval = false)
+    @JsonIgnore
     private List<CourseProgress> courseProgressCollection;
     @OneToMany(mappedBy = "courseId")
+    @JsonIgnore
     private List<CourseRating> courseRatingCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     private List<Lesson> lessonCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     private List<CourseTag> courseTagCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
+    @JsonIgnore
     private List<Cart> cartCollection;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @NotNull(message = "{course.categoryId.notNull.errMsg}")
@@ -126,6 +131,7 @@ public class Course implements Serializable {
     private User lecturerId;
     
     @Transient
+    @JsonIgnore
     private List<CourseTagForm> courseTagForm;
 
     public Course() {

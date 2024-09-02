@@ -4,6 +4,7 @@
  */
 package com.dtl.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -76,6 +77,7 @@ public class LessonContent implements Serializable {
     @ManyToOne(optional = false)
     private Lesson lessonId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lessonContentId")
+    @JsonIgnore
     private Collection<DoingExercise> doingExerciseCollection;
 
     public LessonContent() {

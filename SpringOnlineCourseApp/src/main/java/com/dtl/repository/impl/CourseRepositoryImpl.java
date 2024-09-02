@@ -31,11 +31,13 @@ public class CourseRepositoryImpl implements CourseRepository{
     
     private static final int PAGE_SIZE = 4;
     
+    private int countCourses;
+    
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public List<Course> getCourse(Map<String, String> params) {
+    public List<Course> getCourse(Map<String, String> params, int pageSize) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Course> q = b.createQuery(Course.class);
@@ -72,16 +74,17 @@ public class CourseRepositoryImpl implements CourseRepository{
         }
 
         Query query = s.createQuery(q);
+        
+        countCourses = query.getResultList().size();
 
         if (params != null) {
-            String page = params.get("page");
-            if (page != null && !page.isEmpty()) {
-                int p = Integer.parseInt(page);
-                int start = (p - 1) * PAGE_SIZE;
+            String page = params.get("page") != null && !params.get("page").isEmpty() ? params.get("page") : "1";
 
-                query.setFirstResult(start);
-                query.setMaxResults(PAGE_SIZE);
-            }
+            int p = Integer.parseInt(page);
+            int start = (p - 1) * pageSize;
+
+            query.setFirstResult(start);
+            query.setMaxResults(pageSize);
         }
         
         return query.getResultList();
@@ -112,5 +115,10 @@ public class CourseRepositoryImpl implements CourseRepository{
             throw new EntityNotFoundException("Không tìm thấy khóa học: " + id);
         }
         s.delete(course); 
+    }
+
+    @Override
+    public int countCourses() {
+        return this.countCourses;
     }
 }

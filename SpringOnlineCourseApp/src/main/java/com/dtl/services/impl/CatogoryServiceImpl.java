@@ -53,7 +53,7 @@ public class CatogoryServiceImpl implements CategoryService {
         Map<String, String> param = new Hashtable<>();
         param.put("cateId", String.valueOf(id));
 
-        List<Course> courses = this.courseRepo.getCourse(param);
+        List<Course> courses = this.courseRepo.getCourse(param, 1);
         if (!courses.isEmpty()) {
             throw new IllegalStateException("Tồn tại sản phẩm trong danh mục này!");
 

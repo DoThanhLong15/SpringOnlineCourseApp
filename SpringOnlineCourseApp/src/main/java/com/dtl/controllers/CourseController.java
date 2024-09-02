@@ -45,8 +45,17 @@ public class CourseController {
 
     @GetMapping("/list")
     public String courseList(Model model, @RequestParam Map<String, String> params) {
-        model.addAttribute("categories", this.categoryService.getCategories(null));
+        int pageSize = this.courseService.getPageSize();
+
         model.addAttribute("courses", this.courseService.getCourse(params));
+
+        long totalCourse = this.courseService.countCourses();
+        int totalPages = (int) Math.ceil((double) totalCourse / pageSize);
+        model.addAttribute("q", params.get("q") != null ? params.get("q") : null);
+        model.addAttribute("currentPage", params.get("page") != null ? params.get("page") : 1);
+        model.addAttribute("totalPages", totalPages);
+        
+        model.addAttribute("categories", this.categoryService.getCategories(null));
 
         return "courseList";
     }
