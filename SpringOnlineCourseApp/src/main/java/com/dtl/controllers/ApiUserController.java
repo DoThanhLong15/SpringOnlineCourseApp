@@ -98,12 +98,12 @@ public class ApiUserController {
             return new ResponseEntity<>(messageSource.getMessage("system.errMsg", null, locale), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     @GetMapping(path = "/users/current-user", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
     public ResponseEntity<User> getCurrentUser(Principal user) {
         User u = this.userService.getUserByUsername(user.getName());
-        
+
         return new ResponseEntity<>(u, HttpStatus.OK);
     }
 }

@@ -104,7 +104,6 @@ public class User implements Serializable {
     @NotNull(message = "{user.password.notNull.errMsg}")
     @Size(min = 1, max = 255, message = "{user.password.size.errMsg}")
     @Column(name = "password")
-    @JsonIgnore
     private String password;
     @Column(name = "active")
     @JsonIgnore

@@ -15,6 +15,7 @@ import com.dtl.pojo.User;
 import com.dtl.services.CourseService;
 import com.dtl.services.CourseTagService;
 import com.dtl.services.LessonService;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,6 @@ public class ApiCourseController {
 
     @Autowired
     private CourseService courseService;
-    @Autowired
-    private LessonService lessonService;
-    @Autowired
-    private CourseTagService courseTagService;
 
     @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
@@ -53,7 +50,7 @@ public class ApiCourseController {
         response.put("page", page == null || page.isEmpty() ? 1 : page);
 
         List<CourseListDTO> coursesList = this.courseService.getCourse(params).stream().
-                map(course -> courseList(course)
+                map(course -> new CourseListDTO(course)
         ).collect(Collectors.toList());
         response.put("data", coursesList);
         response.put("count", coursesList.size());
@@ -63,64 +60,15 @@ public class ApiCourseController {
 
     @GetMapping(path = "/{courseId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<Object> getCourseDetail(@PathVariable(value = "courseId") int id) {
+    public ResponseEntity<Object> getCourseDetail(@PathVariable(value = "courseId") int id, Principal user) {
+        
         Map<String, Object> response = new HashMap<>();
 
         Course course = this.courseService.getCourseById(id);
-        CourseDetailDTO courseDetail = courseDetail(course);
+        CourseDetailDTO courseDetail = new CourseDetailDTO(course);
         
         response.put("data", courseDetail);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    private CourseListDTO courseList(Course course) {
-        return new CourseListDTO(
-                course.getId(),
-                course.getTitle(),
-                course.getRating(),
-                course.getRatingCount(),
-                course.getPrice(),
-                course.getImage(),
-                course.getCreatedDate(),
-                course.getUpdatedDate(),
-                course.getParticipantCount()
-        );
-    }
-
-    private CourseDetailDTO courseDetail(Course course) {
-        List<LessonListDTO> lessonList = this.lessonService.getLessons(course.getId()).stream()
-                .map(lesson -> lessonList(lesson))
-                .collect(Collectors.toList());
-        
-        List<Tag> tagList = this.courseTagService.getCourseTags(course.getId(), -1).stream()
-                .map(courseTag -> courseTag.getTagId())
-                .collect(Collectors.toList());
-        
-        User user = course.getLecturerId();
-        UserDTO lecturer = new UserDTO(
-                user.getId(), 
-                user.getFirstName(),
-                user.getLastName(),
-                user.getAvatar()
-        );
-        
-        CourseDetailDTO temp = new CourseDetailDTO(
-                courseList(course),
-                tagList,
-                lessonList,
-                lecturer
-        );
-        
-        return temp;
-    }
-    
-    private LessonListDTO lessonList(Lesson lesson) {
-        return new LessonListDTO(
-                lesson.getId(),
-                lesson.getTitle(),
-                lesson.getCreatedDate(),
-                lesson.getUpdatedDate()
-        );
     }
 }

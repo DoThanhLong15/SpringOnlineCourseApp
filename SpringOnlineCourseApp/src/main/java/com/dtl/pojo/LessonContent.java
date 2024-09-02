@@ -16,7 +16,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -28,6 +27,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  *
@@ -43,6 +46,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "LessonContent.findByDuration", query = "SELECT l FROM LessonContent l WHERE l.duration = :duration"),
     @NamedQuery(name = "LessonContent.findByCreatedDate", query = "SELECT l FROM LessonContent l WHERE l.createdDate = :createdDate"),
     @NamedQuery(name = "LessonContent.findByUpdatedDate", query = "SELECT l FROM LessonContent l WHERE l.updatedDate = :updatedDate")})
+@DynamicInsert
+@DynamicUpdate
 public class LessonContent implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,13 +65,14 @@ public class LessonContent implements Serializable {
     private Integer duration;
     @Basic(optional = false)
     @NotNull
-    @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "content")
     private String content;
+    @CreationTimestamp
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
+    @UpdateTimestamp
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;

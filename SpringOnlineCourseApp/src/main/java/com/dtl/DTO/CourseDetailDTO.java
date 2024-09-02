@@ -4,8 +4,10 @@
  */
 package com.dtl.DTO;
 
+import com.dtl.pojo.Course;
 import com.dtl.pojo.Tag;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -20,11 +22,17 @@ public class CourseDetailDTO extends CourseListDTO{
         super();
     }
     
-    public CourseDetailDTO(CourseListDTO course,List<Tag> tagList, List<LessonListDTO> lessonList, UserDTO lecturer) {
+    public CourseDetailDTO(Course course) {
         super(course);
-        this.tagList = tagList;
-        this.lessonList = lessonList;
-        this.lecturer = lecturer;
+        this.tagList = course.getCourseTagCollection()
+                .stream()
+                .map(courseTag -> courseTag.getTagId())
+                .collect(Collectors.toList());
+        this.lessonList = course.getLessonCollection()
+                .stream()
+                .map(lesson -> new LessonListDTO(lesson))
+                .collect(Collectors.toList());
+        this.lecturer = new UserDTO(course.getLecturerId());
     }
 
     /**

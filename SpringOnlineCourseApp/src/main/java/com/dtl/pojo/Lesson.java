@@ -7,10 +7,12 @@ package com.dtl.pojo;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,6 +28,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  *
@@ -40,6 +46,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Lesson.findByTitle", query = "SELECT l FROM Lesson l WHERE l.title = :title"),
     @NamedQuery(name = "Lesson.findByCreatedDate", query = "SELECT l FROM Lesson l WHERE l.createdDate = :createdDate"),
     @NamedQuery(name = "Lesson.findByUpdatedDate", query = "SELECT l FROM Lesson l WHERE l.updatedDate = :updatedDate")})
+@DynamicInsert
+@DynamicUpdate
 public class Lesson implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,19 +58,21 @@ public class Lesson implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 50, message = "{lesson.title.notNull.errMsg}")
     @Column(name = "title")
     private String title;
-    @Column(name = "created_date")
+    @CreationTimestamp
+    @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
+    @UpdateTimestamp
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lessonId")
-    private Collection<LessonContent> lessonContentCollection;
+    private List<LessonContent> lessonContentCollection;
     @JoinColumn(name = "course_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Course courseId;
 
     public Lesson() {
@@ -110,11 +120,11 @@ public class Lesson implements Serializable {
     }
 
     @XmlTransient
-    public Collection<LessonContent> getLessonContentCollection() {
+    public List<LessonContent> getLessonContentCollection() {
         return lessonContentCollection;
     }
 
-    public void setLessonContentCollection(Collection<LessonContent> lessonContentCollection) {
+    public void setLessonContentCollection(List<LessonContent> lessonContentCollection) {
         this.lessonContentCollection = lessonContentCollection;
     }
 

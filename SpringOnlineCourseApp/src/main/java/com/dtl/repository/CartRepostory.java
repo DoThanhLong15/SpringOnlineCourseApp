@@ -4,19 +4,19 @@
  */
 package com.dtl.repository;
 
-import com.dtl.pojo.Lesson;
+import com.dtl.pojo.Cart;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author LONG
  */
-public interface LessonRepository {
-
-    List<Lesson> getLessons(Map<String, String> params);
-
-    Lesson getLessonById(int id);
-
-    void saveLesson(Lesson lesson);
+public interface CartRepostory {
+    void saveCart(Cart cart);
+    
+    void deleteCart(int id);
+    
+    List<Cart> getCates(int userId);
+    
+    Cart getCartById(int id);
 }

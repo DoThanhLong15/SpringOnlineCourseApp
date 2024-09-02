@@ -5,9 +5,11 @@
 package com.dtl.services.impl;
 
 import com.dtl.pojo.Lesson;
+import com.dtl.repository.LessonContentRepository;
 import com.dtl.repository.LessonRepository;
 import com.dtl.services.LessonService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +22,26 @@ public class LessonServiceImpl implements LessonService{
     
     @Autowired
     private LessonRepository lessonRepo;
+    @Autowired
+    private LessonContentRepository lessonContentRepo;
 
     @Override
-    public List<Lesson> getLessons(int courseId) {
-        return this.lessonRepo.getLessons(courseId);
+    public List<Lesson> getLessons(Map<String, String> params) {
+        return this.lessonRepo.getLessons(params);
     }
 
     @Override
     public Lesson getLessonById(int id) {
-        return this.lessonRepo.getLessonById(id);
+        Lesson lesson = this.lessonRepo.getLessonById(id);
+        
+        lesson.setLessonContentCollection(this.lessonContentRepo.getLessonContent(lesson.getId()));
+        
+        return lesson;
+    }
+
+    @Override
+    public void saveLesson(Lesson lesson) {
+        this.lessonRepo.saveLesson(lesson);
     }
     
 }

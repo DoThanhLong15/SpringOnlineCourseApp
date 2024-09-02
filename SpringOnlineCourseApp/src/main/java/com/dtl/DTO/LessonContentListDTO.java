@@ -4,39 +4,41 @@
  */
 package com.dtl.DTO;
 
-import com.dtl.pojo.Lesson;
+import com.dtl.pojo.LessonContent;
 import java.util.Date;
 
 /**
  *
  * @author LONG
  */
-public class LessonListDTO {
-
+public class LessonContentListDTO {
     private Integer id;
     private String title;
     private Date createdDate;
     private Date updatedDate;
+    private String contentType;
 
-    public LessonListDTO() {
+    public LessonContentListDTO() {
 
     }
     
-    public LessonListDTO(Lesson lesson) {
-        this.id = lesson.getId();
-        this.title = lesson.getTitle();
-        this.createdDate = lesson.getCreatedDate();
-        this.updatedDate = lesson.getUpdatedDate();
+    public LessonContentListDTO(LessonContent lessonContent) {
+        this.id = lessonContent.getId();
+        this.title = lessonContent.getTitle();
+        this.createdDate = lessonContent.getCreatedDate();
+        this.updatedDate = lessonContent.getUpdatedDate();
+        this.contentType = lessonContent.getContentTypeId().getType();
     }
 
-    public LessonListDTO(LessonListDTO lesson) {
-        this.id = lesson.getId();
-        this.title = lesson.getTitle();
-        this.createdDate = lesson.getCreatedDate();
-        this.updatedDate = lesson.getUpdatedDate();
+    public LessonContentListDTO(LessonContentListDTO lessonContent) {
+        this.id = lessonContent.getId();
+        this.title = lessonContent.getTitle();
+        this.createdDate = lessonContent.getCreatedDate();
+        this.updatedDate = lessonContent.getUpdatedDate();
+        this.contentType = lessonContent.getContentType();
     }
 
-    public LessonListDTO(Integer id, String title, Date createdDate, Date updatedDate) {
+    public LessonContentListDTO(Integer id, String title, Date createdDate, Date updatedDate, String contentType) {
         this.id = id;
         this.title = title;
         this.createdDate = createdDate;
@@ -97,5 +99,19 @@ public class LessonListDTO {
      */
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    /**
+     * @return the contentType
+     */
+    public String getContentType() {
+        return contentType;
+    }
+
+    /**
+     * @param contentType the contentType to set
+     */
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }
