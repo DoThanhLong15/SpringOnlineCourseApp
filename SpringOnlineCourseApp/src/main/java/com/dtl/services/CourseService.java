@@ -5,6 +5,7 @@
 package com.dtl.services;
 
 import com.dtl.pojo.Course;
+import com.dtl.pojo.User;
 import java.util.List;
 import java.util.Map;
 
@@ -25,4 +26,8 @@ public interface CourseService {
     int countCourses();
 
     public int getPageSize();
+    
+    boolean hasEnrolled(Course course, User user);
+    
+    boolean isCourseLecturer(Course course, User user);
 }

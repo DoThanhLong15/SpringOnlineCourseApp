@@ -57,6 +57,8 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
                     Set<GrantedAuthority> authorities = new HashSet<>();
                     authorities.add(new SimpleGrantedAuthority(user.getUserRoleId().getRole()));
                     
+                    System.out.println(user.getUserRoleId().getRole());
+                    
                     UserDetails userDetail = new org.springframework.security.core.userdetails.User(username, user.getPassword(), enabled, accountNonExpired,
                             credentialsNonExpired, accountNonLocked, authorities);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail,

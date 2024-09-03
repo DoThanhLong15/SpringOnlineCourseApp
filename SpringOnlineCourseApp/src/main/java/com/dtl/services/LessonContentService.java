@@ -17,4 +17,6 @@ public interface LessonContentService {
     LessonContent getLessonContentById(int id);
     
     void saveLessonContent(LessonContent lessonContent);
+    
+    boolean hasLessonContent(int lessonId, String title);
 }

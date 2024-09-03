@@ -4,17 +4,18 @@
  */
 package com.dtl.controllers;
 
-import com.dtl.DTO.LessonDetailDTO;
+import com.dtl.DTO.CartDTO;
 import com.dtl.pojo.Cart;
-import com.dtl.pojo.Lesson;
 import com.dtl.pojo.User;
 import com.dtl.services.CartService;
+import com.dtl.services.CourseService;
+import com.dtl.services.UserService;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import javax.persistence.EntityNotFoundException;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -24,7 +25,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,30 +35,54 @@ import org.springframework.web.bind.annotation.RestController;
  * @author LONG
  */
 @RestController
-@RequestMapping("/api/courses")
+@RequestMapping("/api/carts")
 public class ApiCartController {
-    
+
     @Autowired
     private CartService cartService;
     @Autowired
+    private UserService userService;
+    @Autowired
+    private CourseService courseService;
+    @Autowired
     private MessageSource messageSource;
 
-    @GetMapping("/{lessonId}")
+    @GetMapping("/")
     @CrossOrigin
-    public ResponseEntity<Object> createLesson(Locale locale, Principal user, @PathVariable(value = "lessonId") int id) {
+    public ResponseEntity<Object> getCartList(Locale locale, Principal user) {
         Map<String, Object> response = new HashMap<>();
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        User userDetail = this.userService.getUserByUsername(user.getName());
+
+        List<CartDTO> cartList = this.cartService.getCates(userDetail.getId(), -1)
+                .stream()
+                .map(cart -> new CartDTO(cart.getId(), cart.getLearnerId().getId(), cart.getCourseId()))
+                .collect(Collectors.toList());
+
+        response.put("data", cartList);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/")
     @CrossOrigin
-    public ResponseEntity<Object> addToCart(@Valid @RequestBody int courseId,
-            BindingResult bindingResult, Locale locale, Principal user) {
+    public ResponseEntity<Object> addToCart(@Valid @RequestBody Cart cart,
+            BindingResult bindingResult, Principal user, Locale locale) {
 
-        Map<String, String> response = new HashMap<>();
+        cart.setLearnerId(this.userService.getUserByUsername(user.getName()));
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        List<Cart> cartList = this.cartService.getCates(cart.getLearnerId().getId(), cart.getCourseId().getId());
+        if (cartList != null || !cartList.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            
+            response.put("error", messageSource.getMessage("cart.courseId.exist.errMsg", null, locale));
+
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        this.cartService.saveCart(cart);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
+
 }

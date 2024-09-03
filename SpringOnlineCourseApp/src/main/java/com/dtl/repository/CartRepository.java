@@ -11,12 +11,12 @@ import java.util.List;
  *
  * @author LONG
  */
-public interface CartRepostory {
+public interface CartRepository {
     void saveCart(Cart cart);
     
     void deleteCart(int id);
     
-    List<Cart> getCates(int userId);
+    List<Cart> getCates(int userId, int courseId);
     
     Cart getCartById(int id);
 }

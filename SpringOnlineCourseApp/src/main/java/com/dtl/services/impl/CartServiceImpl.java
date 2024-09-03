@@ -5,21 +5,21 @@
 package com.dtl.services.impl;
 
 import com.dtl.pojo.Cart;
-import com.dtl.repository.CartRepostory;
 import com.dtl.services.CartService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.dtl.repository.CartRepository;
 
 /**
  *
  * @author LONG
  */
 @Service
-public class CartSrviceImpl implements CartService{
+public class CartServiceImpl implements CartService{
     
     @Autowired
-    private CartRepostory cartRepo;
+    private CartRepository cartRepo;
 
     @Override
     public void saveCart(Cart cart) {
@@ -32,8 +32,8 @@ public class CartSrviceImpl implements CartService{
     }
 
     @Override
-    public List<Cart> getCates(int userId) {
-        return this.cartRepo.getCates(userId);
+    public List<Cart> getCates(int userId, int courseId) {
+        return this.cartRepo.getCates(userId, courseId);
     }
 
     @Override

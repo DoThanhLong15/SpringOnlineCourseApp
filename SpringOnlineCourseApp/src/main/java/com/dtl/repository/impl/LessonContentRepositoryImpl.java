@@ -60,7 +60,31 @@ public class LessonContentRepositoryImpl implements LessonContentRepository {
 
     @Override
     public void saveLessonContent(LessonContent lessonContent) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Session s = this.factory.getObject().getCurrentSession();
+        if (lessonContent.getId() != null) {
+            s.update(lessonContent);
+        } else {
+            s.save(lessonContent);
+        }
+    }
+
+    @Override
+    public boolean hasLessonContent(int lessonId, String title) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Long> q = b.createQuery(Long.class);
+
+        Root<LessonContent> root = q.from(LessonContent.class);
+
+        q.select(b.count(root))
+                .where(
+                        b.like(root.get("title"), String.format("%%%s%%", title)),
+                        b.equal(root.get("lessonId"), lessonId)
+                );
+
+        Long count = s.createQuery(q).getSingleResult();
+
+        return count > 0;
     }
 
 }
