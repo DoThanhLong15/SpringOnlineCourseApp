@@ -75,18 +75,19 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/courses/**").permitAll();
         
         http.authorizeRequests()
-                .antMatchers("/api/courses/**/lessons/**")
+                .antMatchers("/api/**/lessons/**")
                 .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
         
         http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/courses/**/lessons/**/contents/**")
-                .access("hasRole('ROLE_LECTURER')")
-                .antMatchers("/api/courses/**/lessons/**/contents/**")
-                .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
+                .antMatchers(HttpMethod.POST, "/api/**/contents/**").access("hasRole('ROLE_LECTURER')")
+                .antMatchers("/api/**/contents/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
         
         http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/carts/**").access("hasRole('ROLE_LEARNER')")
-                .antMatchers("/api/carts/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
+                .antMatchers(HttpMethod.POST, "/api/**/carts/**").access("hasRole('ROLE_LEARNER')")
+                .antMatchers("/api/**/carts/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
+        
+        http.authorizeRequests()
+                .antMatchers("/api/**/register-orders/**").access("hasRole('ROLE_LEARNER')");
 
         http.authorizeRequests().antMatchers("/api/users/**").permitAll();
 
@@ -96,8 +97,8 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')")
                 .antMatchers(HttpMethod.POST, "/api/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')")
-                .antMatchers(HttpMethod.DELETE, "/api/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')").and()
-                .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+                .antMatchers(HttpMethod.DELETE, "/api/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')")
+                .and().addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
     }
 }

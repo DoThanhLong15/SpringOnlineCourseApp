@@ -30,8 +30,10 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -87,13 +89,15 @@ public class User implements Serializable {
     @Transient
     @JsonIgnore
     private MultipartFile file;
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @JsonIgnore
+    @CreationTimestamp
     private Date createdDate;
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonIgnore
+    @UpdateTimestamp
     private Date updatedDate;
     @Basic(optional = false)
     @NotNull(message = "{user.username.notNull.errMsg}")

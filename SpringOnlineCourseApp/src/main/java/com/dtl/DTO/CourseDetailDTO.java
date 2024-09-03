@@ -22,8 +22,8 @@ public class CourseDetailDTO extends CourseListDTO{
         super();
     }
     
-    public CourseDetailDTO(Course course) {
-        super(course);
+    public CourseDetailDTO(Course course, boolean isEnroll) {
+        super(course, isEnroll);
         this.tagList = course.getCourseTagCollection()
                 .stream()
                 .map(courseTag -> courseTag.getTagId())

@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,6 +25,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  *
@@ -37,6 +42,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "RegisterOrder.findById", query = "SELECT r FROM RegisterOrder r WHERE r.id = :id"),
     @NamedQuery(name = "RegisterOrder.findByCreatedDate", query = "SELECT r FROM RegisterOrder r WHERE r.createdDate = :createdDate"),
     @NamedQuery(name = "RegisterOrder.findByUpdatedDate", query = "SELECT r FROM RegisterOrder r WHERE r.updatedDate = :updatedDate")})
+@DynamicInsert
+@DynamicUpdate
 public class RegisterOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,16 +52,18 @@ public class RegisterOrder implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date createdDate;
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     private Date updatedDate;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "registerOrderId")
     private Collection<RegisterDetail> registerDetailCollection;
     @JoinColumn(name = "learner_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User learnerId;
 
     public RegisterOrder() {

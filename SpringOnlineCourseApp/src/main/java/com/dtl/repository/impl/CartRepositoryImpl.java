@@ -49,6 +49,13 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
+    public void deleteCart(Cart cart) {
+        Session s = this.factory.getObject().getCurrentSession();
+
+        s.delete(cart);
+    }
+
+    @Override
     public List<Cart> getCates(int userId, int courseId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
@@ -86,5 +93,4 @@ public class CartRepositoryImpl implements CartRepository {
 
         return cart;
     }
-
 }

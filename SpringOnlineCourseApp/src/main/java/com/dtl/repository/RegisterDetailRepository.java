@@ -4,22 +4,13 @@
  */
 package com.dtl.repository;
 
-import com.dtl.pojo.Cart;
+import com.dtl.pojo.RegisterDetail;
 import java.util.List;
 
 /**
  *
  * @author LONG
  */
-public interface CartRepository {
-
-    void saveCart(Cart cart);
-
-    void deleteCart(int id);
-
-    void deleteCart(Cart cart);
-
-    List<Cart> getCates(int userId, int courseId);
-
-    Cart getCartById(int id);
+public interface RegisterDetailRepository {
+    List<RegisterDetail> getRegisterDetail(int orderId);
 }
