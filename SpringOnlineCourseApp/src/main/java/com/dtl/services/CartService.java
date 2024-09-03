@@ -17,6 +17,8 @@ public interface CartService {
 
     void deleteCart(int id);
 
+    void deleteCart(Cart cart);
+
     List<Cart> getCates(int userId, int courseId);
 
     Cart getCartById(int id);

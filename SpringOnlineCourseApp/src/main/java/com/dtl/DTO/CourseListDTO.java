@@ -22,12 +22,13 @@ public class CourseListDTO {
     private Date createdDate;
     private Date updatedDate;
     private int participantCount;
+    private boolean enroll;
     
     public CourseListDTO(){
         
     }
     
-    public CourseListDTO(Course course){
+    public CourseListDTO(Course course, boolean isEnroll){
         this.id = course.getId();
         this.title = course.getTitle();
         this.rating = course.getRating();
@@ -37,6 +38,7 @@ public class CourseListDTO {
         this.createdDate = course.getCreatedDate();
         this.updatedDate = course.getUpdatedDate();
         this.participantCount = course.getParticipantCount();
+        this.enroll = isEnroll;
     }
 
     /**
@@ -163,5 +165,19 @@ public class CourseListDTO {
      */
     public void setParticipantCount(int participantCount) {
         this.participantCount = participantCount;
+    }
+
+    /**
+     * @return the enroll
+     */
+    public boolean isEnroll() {
+        return enroll;
+    }
+
+    /**
+     * @param enroll the enroll to set
+     */
+    public void setEnroll(boolean enroll) {
+        this.enroll = enroll;
     }
 }

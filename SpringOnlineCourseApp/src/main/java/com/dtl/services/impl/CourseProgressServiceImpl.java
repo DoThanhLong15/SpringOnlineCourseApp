@@ -8,11 +8,13 @@ import com.dtl.pojo.CourseProgress;
 import com.dtl.repository.CourseProgressRepository;
 import com.dtl.services.CourseProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author LONG
  */
+@Service
 public class CourseProgressServiceImpl implements CourseProgressService {
 
     @Autowired

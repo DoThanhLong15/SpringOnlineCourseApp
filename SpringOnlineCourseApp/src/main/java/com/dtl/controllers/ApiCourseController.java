@@ -6,21 +6,20 @@ package com.dtl.controllers;
 
 import com.dtl.DTO.CourseDetailDTO;
 import com.dtl.DTO.CourseListDTO;
-import com.dtl.DTO.LessonListDTO;
-import com.dtl.DTO.UserDTO;
 import com.dtl.pojo.Course;
-import com.dtl.pojo.Lesson;
-import com.dtl.pojo.Tag;
 import com.dtl.pojo.User;
+import com.dtl.services.CourseProgressService;
 import com.dtl.services.CourseService;
-import com.dtl.services.CourseTagService;
-import com.dtl.services.LessonService;
+import com.dtl.services.UserService;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,35 +39,69 @@ public class ApiCourseController {
 
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<Object> getCoursesList(Map<String, String> params) {
+    public ResponseEntity<Object> getCoursesList(Map<String, String> params, Principal user, Locale locale) {
         Map<String, Object> response = new HashMap<>();
 
-        String page = params.get("page");
-        response.put("page", page == null || page.isEmpty() ? 1 : page);
+        try {
+            User userDetail = user == null ? null : this.userService.getUserByUsername(user.getName());
 
-        List<CourseListDTO> coursesList = this.courseService.getCourse(params).stream().
-                map(course -> new CourseListDTO(course)
-        ).collect(Collectors.toList());
-        response.put("data", coursesList);
-        response.put("count", coursesList.size());
+            String page = params.get("page");
+            response.put("page", page == null || page.isEmpty() ? 1 : page);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            List<CourseListDTO> coursesList = this.courseService.getCourse(params).stream()
+                    .map(course -> {
+                        boolean isEnrolled = false;
+                        if (userDetail != null && userDetail.getId() != null) {
+                            isEnrolled = this.courseService.hasEnrolled(course, userDetail);
+                        }
+                        return new CourseListDTO(course, isEnrolled);
+                    }).collect(Collectors.toList());
+            
+            response.put("data", coursesList);
+            response.put("count", coursesList.size());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(path = "/{courseId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<Object> getCourseDetail(@PathVariable(value = "courseId") int id, Principal user) {
-        
+    public ResponseEntity<Object> getCourseDetail(@PathVariable(value = "courseId") int id, Principal user, Locale locale) {
+
         Map<String, Object> response = new HashMap<>();
 
-        Course course = this.courseService.getCourseById(id);
-        CourseDetailDTO courseDetail = new CourseDetailDTO(course);
-        
-        response.put("data", courseDetail);
+        try {
+            User userDetail = user == null ? new User() : this.userService.getUserByUsername(user.getName());
+            Course course = this.courseService.getCourseById(id);
+            boolean isEnrolled = false;
+            if (userDetail != null && userDetail.getId() != null) {
+                isEnrolled = this.courseService.hasEnrolled(course, userDetail);
+            }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            CourseDetailDTO courseDetail = new CourseDetailDTO(course, isEnrolled);
+
+            response.put("data", courseDetail);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            response.put("error", messageSource.getMessage("course.notFound.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

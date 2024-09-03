@@ -40,6 +40,11 @@ public class CartServiceImpl implements CartService{
     public Cart getCartById(int id) {
         return this.cartRepo.getCartById(id);
     }
+
+    @Override
+    public void deleteCart(Cart cart) {
+        this.cartRepo.deleteCart(cart);
+    }
             
     
 }

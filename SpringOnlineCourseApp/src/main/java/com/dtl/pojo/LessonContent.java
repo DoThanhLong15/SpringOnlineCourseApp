@@ -71,7 +71,7 @@ public class LessonContent implements Serializable {
     @Column(name = "content")
     private String content;
     @CreationTimestamp
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @UpdateTimestamp

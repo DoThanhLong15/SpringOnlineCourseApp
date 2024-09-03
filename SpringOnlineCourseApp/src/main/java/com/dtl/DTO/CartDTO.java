@@ -14,7 +14,6 @@ public class CartDTO {
 
     private Integer id;
     private Integer ownerId;
-    private String courseId;
     private CourseListDTO course;
 
     public CartDTO() {
@@ -24,7 +23,7 @@ public class CartDTO {
     public CartDTO(Integer id, Integer ownerId, Course course) {
         this.id = id;
         this.ownerId = ownerId;
-        this.course = new CourseListDTO(course);
+        this.course = new CourseListDTO(course, false);
     }
 
     /**
@@ -68,19 +67,4 @@ public class CartDTO {
     public void setCourse(CourseListDTO course) {
         this.course = course;
     }
-
-    /**
-     * @return the courseId
-     */
-    public String getCourseId() {
-        return courseId;
-    }
-
-    /**
-     * @param courseId the courseId to set
-     */
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
 }
