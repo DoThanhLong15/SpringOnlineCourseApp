@@ -4,6 +4,7 @@
  */
 package com.dtl.pojo;
 
+import com.dtl.validation.annotation.LessonContentDurationRequired;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Collection;
@@ -48,6 +49,7 @@ import org.hibernate.annotations.UpdateTimestamp;
     @NamedQuery(name = "LessonContent.findByUpdatedDate", query = "SELECT l FROM LessonContent l WHERE l.updatedDate = :updatedDate")})
 @DynamicInsert
 @DynamicUpdate
+@LessonContentDurationRequired(message = "{lessonContent.duration.notNull.errMsg}")
 public class LessonContent implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -58,13 +60,13 @@ public class LessonContent implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 50, message = "{lessonContent.title.notNull.errMsg}")
     @Column(name = "title")
     private String title;
     @Column(name = "duration")
     private Integer duration;
     @Basic(optional = false)
-    @NotNull
+    @NotNull(message = "{lessonContent.content.notNull.errMsg}")
     @Size(min = 1, max = 65535)
     @Column(name = "content")
     private String content;
@@ -78,6 +80,7 @@ public class LessonContent implements Serializable {
     private Date updatedDate;
     @JoinColumn(name = "content_type_id", referencedColumnName = "id")
     @ManyToOne
+    @NotNull(message = "{lessonContent.contentTypeId.notNull.errMsg}")
     private ContentType contentTypeId;
     @JoinColumn(name = "lesson_id", referencedColumnName = "id")
     @ManyToOne(optional = false)

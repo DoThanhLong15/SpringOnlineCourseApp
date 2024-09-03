@@ -4,9 +4,12 @@
  */
 package com.dtl.repository.impl;
 
-import com.dtl.pojo.Cart;
+import com.dtl.pojo.CourseProgress;
+import com.dtl.repository.CourseProgressRepository;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -16,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.dtl.repository.CartRepository;
-import java.util.ArrayList;
 
 /**
  *
@@ -25,66 +26,61 @@ import java.util.ArrayList;
  */
 @Repository
 @Transactional
-public class CartRepositoryImpl implements CartRepository {
+public class CourseProgressRepositoryImpl implements CourseProgressRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public void saveCart(Cart cart) {
+    public void saveCourseProgress(CourseProgress courseProgress) {
         Session s = this.factory.getObject().getCurrentSession();
-        if (cart.getId() != null) {
-            s.update(cart);
+        if (courseProgress.getId() != null) {
+            s.update(courseProgress);
         } else {
-            s.save(cart);
+            s.save(courseProgress);
         }
     }
 
     @Override
-    public void deleteCart(int id) {
+    public CourseProgress getCourseProgressById(int progressId) {
         Session s = this.factory.getObject().getCurrentSession();
-        Cart cart = this.getCartById(id);
 
-        s.delete(cart);
+        CourseProgress progress = s.get(CourseProgress.class, progressId);
+
+        if (progress == null) {
+            throw new EntityNotFoundException("Không tìm thấy tiến trính khóa học: " + progressId);
+        }
+
+        return progress;
     }
 
     @Override
-    public List<Cart> getCates(int userId, int courseId) {
+    public CourseProgress getCourseProgress(int userId, int courseId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<Cart> q = b.createQuery(Cart.class);
-        Root root = q.from(Cart.class);
+        CriteriaQuery<CourseProgress> q = b.createQuery(CourseProgress.class);
+        Root root = q.from(CourseProgress.class);
         q.select(root);
 
         List<Predicate> predicates = new ArrayList<>();
 
         if (userId != -1) {
-            Predicate predicate = b.equal(root.get("learnerId"), userId);
-            predicates.add(predicate);
+            Predicate p = b.equal(root.get("learnerId"), userId);
+            predicates.add(p);
         }
 
         if (courseId != -1) {
-            Predicate predicate = b.equal(root.get("learnerId"), userId);
-            predicates.add(predicate);
-
+            Predicate p = b.equal(root.get("courseId"), courseId);
+            predicates.add(p);
         }
 
         q.where(predicates.toArray(Predicate[]::new));
 
-        return s.createQuery(q).getResultList();
-    }
-
-    @Override
-    public Cart getCartById(int id) {
-        Session s = this.factory.getObject().getCurrentSession();
-
-        Cart cart = s.get(Cart.class, id);
-
-        if (cart == null) {
-            throw new EntityNotFoundException("Không tìm thấy category: " + id);
+        try {
+            return s.createQuery(q).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
-
-        return cart;
     }
 
 }

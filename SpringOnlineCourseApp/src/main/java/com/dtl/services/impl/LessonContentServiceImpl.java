@@ -35,5 +35,10 @@ public class LessonContentServiceImpl implements LessonContentService{
     public void saveLessonContent(LessonContent lessonContent) {
         this.lessonContentRepo.saveLessonContent(lessonContent);
     }
+
+    @Override
+    public boolean hasLessonContent(int lessonId, String title) {
+        return this.lessonContentRepo.hasLessonContent(lessonId, title);
+    }
     
 }

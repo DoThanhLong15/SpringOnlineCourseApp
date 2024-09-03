@@ -4,18 +4,18 @@
  */
 package com.dtl.controllers;
 
-import com.dtl.DTO.LessonDetailDTO;
+import com.dtl.DTO.LessonContentDetailDTO;
 import com.dtl.pojo.Course;
 import com.dtl.pojo.Lesson;
+import com.dtl.pojo.LessonContent;
 import com.dtl.pojo.User;
 import com.dtl.services.CourseService;
-import com.dtl.services.LessonService;
+import com.dtl.services.LessonContentService;
 import com.dtl.services.UserService;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,44 +37,45 @@ import org.springframework.web.bind.annotation.RestController;
  * @author LONG
  */
 @RestController
-@RequestMapping("/api/courses/{courseId}/lessons")
-public class ApiLessonController {
+@RequestMapping("/api/courses/{courseId}/lessons/{lessonId}/contents")
+public class ApiLessonContentController {
 
     @Autowired
-    private LessonService lessonService;
+    private LessonContentService lessonContentService;
+    @Autowired
+    private MessageSource messageSource;
     @Autowired
     private UserService userService;
     @Autowired
     private CourseService courseService;
-    @Autowired
-    private MessageSource messageSource;
 
-    @GetMapping("/{lessonId}")
+    @GetMapping("/{contentId}")
     @CrossOrigin
-    public ResponseEntity<Object> getLessonDetail(Locale locale, Principal user,
-            @PathVariable(value = "lessonId") int lessonId,
+    public ResponseEntity<Object> getContent(Locale locale, Principal user,
+            @PathVariable(value = "contentId") int contentId,
             @PathVariable(value = "courseId") int courseId) {
+
         Map<String, Object> response = new HashMap<>();
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
 
-        if (!this.courseService.isCourseLecturer(course, userDetail)
-                && !this.courseService.hasEnrolled(course, userDetail)) {
+        if (!this.courseService.hasEnrolled(course, userDetail) 
+                && !this.courseService.isCourseLecturer(course, userDetail)) {
             response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
+
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         try {
-            Lesson lesson = this.lessonService.getLessonById(lessonId);
-            response.put("data", new LessonDetailDTO(lesson));
+            response.put("data", new LessonContentDetailDTO(this.lessonContentService.getLessonContentById(contentId)));
 
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (EntityNotFoundException ex) {
             System.out.println(ex.getMessage());
 
-            response.put("error", messageSource.getMessage("lesson.notFound.errMsg", null, locale));
+            response.put("error", messageSource.getMessage("lessonContent.notFound.errMsg", null, locale));
 
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
@@ -88,11 +89,13 @@ public class ApiLessonController {
 
     @PostMapping("/")
     @CrossOrigin
-    public ResponseEntity<Object> createLesson(@Valid @RequestBody Lesson lesson,
-            BindingResult bindingResult, Locale locale, Principal user,
-            @PathVariable(value = "courseId") int courseId) {
+    public ResponseEntity<Object> addLessonContent(@Valid @RequestBody LessonContent lessonContent,
+            BindingResult bindingResult, Principal user, Locale locale,
+            @PathVariable(value = "courseId") int courseId,
+            @PathVariable(value = "lessonId") int lessonId) {
 
         Map<String, Object> response = new HashMap<>();
+
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
 
@@ -103,7 +106,7 @@ public class ApiLessonController {
         }
 
         if (bindingResult.hasErrors()) {
-            response.put("error", new HashMap<String, String>());
+            response.put("error", new HashMap<>());
             Map<String, String> errors = (Map<String, String>) response.get("error");
 
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -111,27 +114,19 @@ public class ApiLessonController {
             }
 
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
         }
 
-        try {
-            Map<String, String> params = new HashMap<>();
-            params.put("title", lesson.getTitle());
-            params.put("courseId", String.valueOf(courseId));
-            if (!this.lessonService.getLessons(params).isEmpty()) {
-                response.put("error", messageSource.getMessage("lesson.title.exist.errMsg", null, locale));
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-
-            this.lessonService.saveLesson(lesson);
-
-            return new ResponseEntity<>(HttpStatus.CREATED);
-
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-
-            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
+        if (this.lessonContentService.hasLessonContent(lessonId, lessonContent.getTitle())) {
+            response.put("error", messageSource.getMessage("lessonContent.title.exist.errMsg", null, locale));
 
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+
+        lessonContent.setLessonId(new Lesson());
+        lessonContent.getLessonId().setId(lessonId);
+        this.lessonContentService.saveLessonContent(lessonContent);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
