@@ -5,6 +5,8 @@
 package com.dtl.repository.impl;
 
 import com.dtl.pojo.Course;
+import com.dtl.pojo.Lesson;
+import com.dtl.pojo.LessonContent;
 import com.dtl.repository.CourseRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.hibernate.Session;
@@ -27,12 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class CourseRepositoryImpl implements CourseRepository{
-    
-    private static final int PAGE_SIZE = 4;
-    
+public class CourseRepositoryImpl implements CourseRepository {
+
     private int countCourses;
-    
+
     @Autowired
     private LocalSessionFactoryBean factory;
 
@@ -74,7 +75,7 @@ public class CourseRepositoryImpl implements CourseRepository{
         }
 
         Query query = s.createQuery(q);
-        
+
         countCourses = query.getResultList().size();
 
         if (params != null) {
@@ -86,7 +87,7 @@ public class CourseRepositoryImpl implements CourseRepository{
             query.setFirstResult(start);
             query.setMaxResults(pageSize);
         }
-        
+
         return query.getResultList();
     }
 
@@ -103,22 +104,49 @@ public class CourseRepositoryImpl implements CourseRepository{
     @Override
     public Course getCourseById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        return s.get(Course.class, id);
+        Course course = s.get(Course.class, id);
+                
+        if(course == null){
+            throw new EntityNotFoundException("course.notFound.errMsg");
+        }
+        
+        return course;
     }
 
     @Override
     public void deleteCourse(int id) {
         Session s = this.factory.getObject().getCurrentSession();
         Course course = this.getCourseById(id);
-        
+
         if (course == null) {
             throw new EntityNotFoundException("Không tìm thấy khóa học: " + id);
         }
-        s.delete(course); 
+        s.delete(course);
     }
 
     @Override
     public int countCourses() {
         return this.countCourses;
+    }
+
+    @Override
+    public Integer countContentInCourse(int courseId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+
+        CriteriaQuery<Long> query = b.createQuery(Long.class);
+        Root<Course> root = query.from(Course.class);
+
+        Join<Course, Lesson> lessonJoin = root.join("lessonCollection");
+        Join<Lesson, LessonContent> contentJoin = lessonJoin.join("lessonContentCollection");
+
+
+        query.where(b.equal(root.get("id"), courseId));
+
+        query.select(b.count(contentJoin));
+
+        Long contentCount = s.createQuery(query).getSingleResult();
+
+        return contentCount != null ? contentCount.intValue() : 0;
     }
 }

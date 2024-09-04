@@ -23,4 +23,6 @@ public interface CourseRepository {
     void deleteCourse(int id);
 
     int countCourses();
+    
+    Integer countContentInCourse(int courseId);
 }

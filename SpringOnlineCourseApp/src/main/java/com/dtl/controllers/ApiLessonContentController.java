@@ -5,18 +5,24 @@
 package com.dtl.controllers;
 
 import com.dtl.DTO.LessonContentDetailDTO;
+import com.dtl.components.ErrorResponseUtil;
 import com.dtl.pojo.Course;
+import com.dtl.pojo.CourseProgress;
+import com.dtl.pojo.DoingExercise;
+import com.dtl.pojo.ExerciseStatus;
 import com.dtl.pojo.Lesson;
 import com.dtl.pojo.LessonContent;
 import com.dtl.pojo.User;
+import com.dtl.services.CourseProgressService;
 import com.dtl.services.CourseService;
+import com.dtl.services.DoingExerciseService;
 import com.dtl.services.LessonContentService;
+import com.dtl.services.LessonService;
 import com.dtl.services.UserService;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -48,43 +54,40 @@ public class ApiLessonContentController {
     private UserService userService;
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private DoingExerciseService doingExerciseServise;
+    @Autowired
+    private CourseProgressService courseProgressService;
+    @Autowired
+    private LessonService lessonService;
+    @Autowired
+    private ErrorResponseUtil errorResponseUtil;
 
     @GetMapping("/{contentId}")
     @CrossOrigin
     public ResponseEntity<Object> getContent(Locale locale, Principal user,
             @PathVariable(value = "contentId") int contentId,
-            @PathVariable(value = "courseId") int courseId) {
+            @PathVariable(value = "courseId") int courseId,
+            @PathVariable(value = "lessonId") int lessonId) {
 
         Map<String, Object> response = new HashMap<>();
-
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        LessonContent content = this.lessonContentService.getLessonContentById(contentId);
 
-        if (!this.courseService.hasEnrolled(course, userDetail) 
+        if (!this.courseService.hasEnrolled(course, userDetail)
                 && !this.courseService.isCourseLecturer(course, userDetail)) {
-            response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
-        try {
-            response.put("data", new LessonContentDetailDTO(this.lessonContentService.getLessonContentById(contentId)));
+        LessonContentDetailDTO lessonContent = new LessonContentDetailDTO(content);
+        lessonContent.setHasLearn(false);
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        handleExercise(userDetail, content, lessonContent, course);
 
-        } catch (EntityNotFoundException ex) {
-            System.out.println(ex.getMessage());
-
-            response.put("error", messageSource.getMessage("lessonContent.notFound.errMsg", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-
-            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        response.put("data", lessonContent);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/")
@@ -94,33 +97,26 @@ public class ApiLessonContentController {
             @PathVariable(value = "courseId") int courseId,
             @PathVariable(value = "lessonId") int lessonId) {
 
-        Map<String, Object> response = new HashMap<>();
-
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
 
         if (!this.courseService.isCourseLecturer(course, userDetail)) {
-            response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
+        Map<String, Object> response = new HashMap<>();
         if (bindingResult.hasErrors()) {
             response.put("error", new HashMap<>());
             Map<String, String> errors = (Map<String, String>) response.get("error");
-
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-
+            return this.errorResponseUtil.buildErrorResponse(response, locale);
         }
 
         if (this.lessonContentService.hasLessonContent(lessonId, lessonContent.getTitle())) {
-            response.put("error", messageSource.getMessage("lessonContent.title.exist.errMsg", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return this.errorResponseUtil.buildErrorResponse("lessonContent.title.exist.errMsg", locale);
         }
 
         lessonContent.setLessonId(new Lesson());
@@ -128,5 +124,29 @@ public class ApiLessonContentController {
         this.lessonContentService.saveLessonContent(lessonContent);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    // helper method
+    private void handleExercise(User userDetail, LessonContent content, LessonContentDetailDTO lessonContent, Course course) {
+        DoingExercise exercise = doingExerciseServise.getDoingExercise(userDetail.getId(), content.getId());
+
+        if (exercise != null) {
+            if ("DONE".equals(exercise.getExerciseStatusId().getStatus())) {
+                lessonContent.setHasLearn(true);
+            }
+        } else {
+            if ("LESSON".equals(lessonContent.getContentType())) {
+                exercise = new DoingExercise();
+                exercise.setLessonContentId(content);
+                exercise.setLearnerId(userDetail);
+                exercise.setExerciseStatusId(new ExerciseStatus(3)); // DONE
+
+                doingExerciseServise.saveDoingExercise(exercise);
+
+                CourseProgress progress = courseProgressService.getCourseProgress(userDetail.getId(), course.getId());
+                progress.setLessonCompleteCount(progress.getLessonCompleteCount() + 1);
+                courseProgressService.saveCourseProgress(progress);
+            }
+        }
     }
 }

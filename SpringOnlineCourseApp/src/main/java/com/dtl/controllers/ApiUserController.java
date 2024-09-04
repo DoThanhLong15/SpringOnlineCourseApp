@@ -92,10 +92,10 @@ public class ApiUserController {
             this.userService.addOrUpdateUser(user);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (Exception e) {
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             errors.put("error", messageSource.getMessage("system.errMsg", null, locale));
-
-            return new ResponseEntity<>(messageSource.getMessage("system.errMsg", null, locale), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

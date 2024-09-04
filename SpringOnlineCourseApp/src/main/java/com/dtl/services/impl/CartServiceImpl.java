@@ -1,10 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+/* 
+* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.dtl.services.impl;
 
 import com.dtl.pojo.Cart;
+import com.dtl.pojo.User;
 import com.dtl.services.CartService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ import com.dtl.repository.CartRepository;
  * @author LONG
  */
 @Service
-public class CartServiceImpl implements CartService{
-    
+public class CartServiceImpl implements CartService {
+
     @Autowired
     private CartRepository cartRepo;
 
@@ -45,6 +46,9 @@ public class CartServiceImpl implements CartService{
     public void deleteCart(Cart cart) {
         this.cartRepo.deleteCart(cart);
     }
-            
-    
+
+    @Override
+    public boolean isCartOwner(User owner, User user) {
+        return owner.getId() == user.getId();
+    }
 }

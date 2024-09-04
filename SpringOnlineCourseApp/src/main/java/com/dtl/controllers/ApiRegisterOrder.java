@@ -7,10 +7,12 @@ package com.dtl.controllers;
 import com.dtl.DTO.RegisterOrderDetailDTO;
 import com.dtl.DTO.RegisterOrderListDTO;
 import com.dtl.pojo.Cart;
+import com.dtl.pojo.CourseProgress;
 import com.dtl.pojo.RegisterDetail;
 import com.dtl.pojo.RegisterOrder;
 import com.dtl.pojo.User;
 import com.dtl.services.CartService;
+import com.dtl.services.CourseProgressService;
 import com.dtl.services.RegisterOrderService;
 import com.dtl.services.UserService;
 import java.security.Principal;
@@ -45,6 +47,8 @@ public class ApiRegisterOrder {
     private RegisterOrderService registerOrderService;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private CourseProgressService courseProgressService;
     @Autowired
     private MessageSource messageSource;
 
@@ -84,11 +88,11 @@ public class ApiRegisterOrder {
             response.put("data", new RegisterOrderDetailDTO(registerOrder));
 
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }catch(EntityNotFoundException ex) {
+        } catch (EntityNotFoundException ex) {
             System.out.println(ex.getMessage());
             response.put("error", messageSource.getMessage("registerOrder.notFound.errMsg", null, locale));
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
             response.put("error", messageSource.getMessage("system.errMsg", null, locale));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,14 +115,29 @@ public class ApiRegisterOrder {
         try {
             RegisterOrder order = new RegisterOrder();
             order.setLearnerId(userDetail);
-            order.setRegisterDetailCollection(cartList.stream().map(cart -> {
+            
+            List<RegisterDetail> registerDetails = cartList.stream().map(cart -> {
                 RegisterDetail orderDetail = new RegisterDetail();
                 orderDetail.setCourseId(cart.getCourseId());
                 orderDetail.setPrice(cart.getCourseId().getPrice());
+                orderDetail.setRegisterOrderId(order);
+
+                // Create and save CourseProgress
+                CourseProgress courseProgress = new CourseProgress();
+                courseProgress.setCourseId(cart.getCourseId());
+                courseProgress.setLearnerId(userDetail);
+                courseProgress.setLessonCompleteCount(0);
+                this.courseProgressService.saveCourseProgress(courseProgress);
+
+                // Remove cart item
+                this.cartService.deleteCart(cart);
 
                 return orderDetail;
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.toList());
 
+            order.setRegisterDetailCollection(registerDetails);
+
+            // Save the order along with its details
             this.registerOrderService.saveRegisterOrder(order);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -127,6 +146,5 @@ public class ApiRegisterOrder {
             response.put("error", messageSource.getMessage("system.errMsg", null, locale));
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 }

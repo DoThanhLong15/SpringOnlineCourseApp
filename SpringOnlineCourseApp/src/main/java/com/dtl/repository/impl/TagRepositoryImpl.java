@@ -100,7 +100,7 @@ public class TagRepositoryImpl implements TagRepository {
         Tag tag = s.get(Tag.class, id);
 
         if (tag == null) {
-            throw new EntityNotFoundException("Không tìm thấy thẻ: " + id);
+            throw new EntityNotFoundException("tag.notFound.errMsg");
         }
 
         return tag;

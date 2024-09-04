@@ -57,7 +57,12 @@ public class ApiLessonController {
         Map<String, Object> response = new HashMap<>();
 
         User userDetail = this.userService.getUserByUsername(user.getName());
+        
         Course course = this.courseService.getCourseById(courseId);
+        if(course == null){
+            response.put("error", messageSource.getMessage("course.notFound.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
 
         if (!this.courseService.isCourseLecturer(course, userDetail)
                 && !this.courseService.hasEnrolled(course, userDetail)) {
@@ -73,16 +78,12 @@ public class ApiLessonController {
 
         } catch (EntityNotFoundException ex) {
             System.out.println(ex.getMessage());
-
             response.put("error", messageSource.getMessage("lesson.notFound.errMsg", null, locale));
-
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-
             response.put("error", messageSource.getMessage("system.errMsg", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -94,11 +95,15 @@ public class ApiLessonController {
 
         Map<String, Object> response = new HashMap<>();
         User userDetail = this.userService.getUserByUsername(user.getName());
+        
         Course course = this.courseService.getCourseById(courseId);
+        if(course == null){
+            response.put("error", messageSource.getMessage("course.notFound.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
 
         if (!this.courseService.isCourseLecturer(course, userDetail)) {
             response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
-
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -128,10 +133,8 @@ public class ApiLessonController {
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-
             response.put("error", messageSource.getMessage("system.errMsg", null, locale));
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

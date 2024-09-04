@@ -50,9 +50,8 @@ public class LessonContentRepositoryImpl implements LessonContentRepository {
         Session s = this.factory.getObject().getCurrentSession();
 
         LessonContent lessonContent = s.get(LessonContent.class, id);
-
-        if (lessonContent == null) {
-            throw new EntityNotFoundException("Không tìm thấy bài học: " + id);
+        if(lessonContent == null) {
+            throw new EntityNotFoundException("lessonContent.notFound.errMsg");
         }
 
         return lessonContent;

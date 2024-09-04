@@ -7,6 +7,7 @@ package com.dtl.repository.impl;
 import com.dtl.pojo.UserRole;
 import com.dtl.repository.UserRoleRepository;
 import java.util.List;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,13 @@ public class UserRoleRepositoryImpl implements UserRoleRepository {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createNamedQuery("UserRole.findById");
         q.setParameter("id", id);
+        
+        UserRole userRole = (UserRole) q.getSingleResult();
+        if(userRole == null) {
+            throw new EntityNotFoundException("lesson.notFound.errMsg");
+        }
 
-        return (UserRole) q.getSingleResult();
+        return userRole;
     }
 
     @Override

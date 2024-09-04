@@ -22,12 +22,14 @@ public interface CourseService {
     Course getCourseById(int id);
 
     void deleteCourse(int id);
-    
+
     int countCourses();
 
     public int getPageSize();
-    
+
     boolean hasEnrolled(Course course, User user);
-    
+
     boolean isCourseLecturer(Course course, User user);
+
+    Integer countContentInCourse(int courseId);
 }

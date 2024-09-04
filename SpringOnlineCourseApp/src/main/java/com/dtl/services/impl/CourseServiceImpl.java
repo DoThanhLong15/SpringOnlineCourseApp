@@ -118,4 +118,9 @@ public class CourseServiceImpl implements CourseService {
     public boolean isCourseLecturer(Course course, User user) {
         return Objects.equals(course.getLecturerId().getId(), user.getId());
     }
+
+    @Override
+    public Integer countContentInCourse(int courseId) {
+        return this.courseRepo.countContentInCourse(courseId);
+    }
 }

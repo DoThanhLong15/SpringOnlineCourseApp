@@ -59,7 +59,7 @@ public class RegisterOrderRepostoryImpl implements RegisterOrderRepository {
         RegisterOrder order = s.get(RegisterOrder.class, orderId);
 
         if (order == null) {
-            throw new EntityNotFoundException("Không tìm thấy đơn hàng: " + orderId);
+            throw new EntityNotFoundException("registerOrder.notFound.errMsg");
         }
 
         return order;
