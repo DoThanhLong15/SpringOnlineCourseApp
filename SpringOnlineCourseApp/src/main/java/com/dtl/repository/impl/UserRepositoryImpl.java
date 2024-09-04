@@ -9,6 +9,7 @@ import com.dtl.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -100,6 +101,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User getUserById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        return s.get(User.class, id);
+        
+        User user = s.get(User.class, id);
+        if(user == null) {
+            throw new EntityNotFoundException("user.notFound.deny");
+        }
+        
+        return user;
     }
 }

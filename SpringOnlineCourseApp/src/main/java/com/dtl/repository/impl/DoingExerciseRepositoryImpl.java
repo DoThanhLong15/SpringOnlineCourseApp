@@ -4,9 +4,13 @@
  */
 package com.dtl.repository.impl;
 
-import com.dtl.pojo.Cart;
+import com.dtl.pojo.CourseProgress;
+import com.dtl.pojo.DoingExercise;
+import com.dtl.repository.DoingExerciseRepository;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -16,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.dtl.repository.CartRepository;
-import java.util.ArrayList;
 
 /**
  *
@@ -25,70 +27,60 @@ import java.util.ArrayList;
  */
 @Repository
 @Transactional
-public class CartRepositoryImpl implements CartRepository {
+public class DoingExerciseRepositoryImpl implements DoingExerciseRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
 
     @Override
-    public void saveCart(Cart cart) {
+    public void saveDoingExercise(DoingExercise exercise) {
         Session s = this.factory.getObject().getCurrentSession();
-        if (cart.getId() != null) {
-            s.update(cart);
+        if (exercise.getId() != null) {
+            s.update(exercise);
         } else {
-            s.save(cart);
+            s.save(exercise);
         }
     }
 
     @Override
-    public void deleteCart(int id) {
+    public DoingExercise getDoingExerciseById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        Cart cart = this.getCartById(id);
+        
+        DoingExercise exercise = s.get(DoingExercise.class, id);
+        if(exercise == null) {
+            throw new EntityNotFoundException("doingExercise.notFound.errMsg");
+        }
 
-        s.delete(cart);
+        return exercise;
     }
 
     @Override
-    public void deleteCart(Cart cart) {
-        Session s = this.factory.getObject().getCurrentSession();
-        s.delete(cart);
-    }
-
-    @Override
-    public List<Cart> getCates(int userId, int courseId) {
+    public DoingExercise getDoingExercise(int learnerId, int contentId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<Cart> q = b.createQuery(Cart.class);
-        Root root = q.from(Cart.class);
+        CriteriaQuery<DoingExercise> q = b.createQuery(DoingExercise.class);
+        Root root = q.from(DoingExercise.class);
         q.select(root);
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (userId != -1) {
-            Predicate predicate = b.equal(root.get("learnerId"), userId);
-            predicates.add(predicate);
+        if (learnerId != -1) {
+            Predicate p = b.equal(root.get("learnerId"), learnerId);
+            predicates.add(p);
         }
 
-        if (courseId != -1) {
-            Predicate predicate = b.equal(root.get("learnerId"), userId);
-            predicates.add(predicate);
-
+        if (contentId != -1) {
+            Predicate p = b.equal(root.get("lessonContentId"), contentId);
+            predicates.add(p);
         }
 
         q.where(predicates.toArray(Predicate[]::new));
 
-        return s.createQuery(q).getResultList();
-    }
-
-    @Override
-    public Cart getCartById(int id) {
-        Session s = this.factory.getObject().getCurrentSession();
-
-        Cart cart = s.get(Cart.class, id);
-        if(cart == null){
-            throw new EntityNotFoundException("cart.notFound.errMsg");
+        try {
+            return s.createQuery(q).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
-
-        return cart;
     }
+
 }

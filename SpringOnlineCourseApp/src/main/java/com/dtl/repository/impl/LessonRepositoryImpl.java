@@ -66,9 +66,9 @@ public class LessonRepositoryImpl implements LessonRepository {
         Session s = this.factory.getObject().getCurrentSession();
 
         Lesson lesson = s.get(Lesson.class, id);
-
-        if (lesson == null) {
-            throw new EntityNotFoundException("Không tìm thấy lesson: " + id);
+        
+        if(lesson == null){
+            throw new EntityNotFoundException("lesson.notFound.errMsg");
         }
 
         return lesson;

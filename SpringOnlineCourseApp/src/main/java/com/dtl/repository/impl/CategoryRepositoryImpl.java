@@ -7,7 +7,6 @@ package com.dtl.repository.impl;
 import com.dtl.pojo.Category;
 import com.dtl.repository.CategoryRepository;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityNotFoundException;
@@ -101,7 +100,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         Category category = s.get(Category.class, id);
 
         if (category == null) {
-            throw new EntityNotFoundException("Không tìm thấy category: " + id);
+            throw new EntityNotFoundException("category.notFound.errMsg");
         }
 
         return category;

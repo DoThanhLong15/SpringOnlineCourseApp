@@ -5,6 +5,7 @@
 package com.dtl.services;
 
 import com.dtl.pojo.Cart;
+import com.dtl.pojo.User;
 import java.util.List;
 
 /**
@@ -22,4 +23,6 @@ public interface CartService {
     List<Cart> getCates(int userId, int courseId);
 
     Cart getCartById(int id);
+    
+    boolean isCartOwner(User owner, User user);
 }

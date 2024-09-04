@@ -15,6 +15,7 @@ public class LessonContentDetailDTO extends LessonContentListDTO {
     private int duration;
     private String content;
     private int lessonId;
+    private boolean hasLearn;
 
     public LessonContentDetailDTO() {
 
@@ -67,5 +68,19 @@ public class LessonContentDetailDTO extends LessonContentListDTO {
      */
     public void setLessonId(int lessonId) {
         this.lessonId = lessonId;
+    }
+
+    /**
+     * @return the hasLearn
+     */
+    public boolean isHasLearn() {
+        return hasLearn;
+    }
+
+    /**
+     * @param hasLearn the hasLearn to set
+     */
+    public void setHasLearn(boolean hasLearn) {
+        this.hasLearn = hasLearn;
     }
 }

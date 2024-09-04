@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,6 +28,10 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  *
@@ -41,6 +46,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "DoingExercise.findByScore", query = "SELECT d FROM DoingExercise d WHERE d.score = :score"),
     @NamedQuery(name = "DoingExercise.findByCreatedDate", query = "SELECT d FROM DoingExercise d WHERE d.createdDate = :createdDate"),
     @NamedQuery(name = "DoingExercise.findByUpdatedDate", query = "SELECT d FROM DoingExercise d WHERE d.updatedDate = :updatedDate")})
+@DynamicInsert
+@DynamicUpdate
 public class DoingExercise implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -56,22 +63,24 @@ public class DoingExercise implements Serializable {
     @Size(max = 65535)
     @Column(name = "content")
     private String content;
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date createdDate;
     @Column(name = "updated_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     private Date updatedDate;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "doingExerciseId")
     private Collection<ScoreLearnerExercise> scoreLearnerExerciseCollection;
     @JoinColumn(name = "exercise_status_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private ExerciseStatus exerciseStatusId;
     @JoinColumn(name = "lesson_content_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private LessonContent lessonContentId;
     @JoinColumn(name = "learner_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User learnerId;
 
     public DoingExercise() {

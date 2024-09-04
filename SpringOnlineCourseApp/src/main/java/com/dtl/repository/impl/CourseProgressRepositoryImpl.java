@@ -46,9 +46,8 @@ public class CourseProgressRepositoryImpl implements CourseProgressRepository {
         Session s = this.factory.getObject().getCurrentSession();
 
         CourseProgress progress = s.get(CourseProgress.class, progressId);
-
-        if (progress == null) {
-            throw new EntityNotFoundException("Không tìm thấy tiến trính khóa học: " + progressId);
+        if(progress == null){
+            throw new EntityNotFoundException("courseProgress.notFound.errMsg");
         }
 
         return progress;

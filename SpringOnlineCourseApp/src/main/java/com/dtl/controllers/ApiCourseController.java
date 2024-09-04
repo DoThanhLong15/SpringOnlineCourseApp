@@ -6,7 +6,9 @@ package com.dtl.controllers;
 
 import com.dtl.DTO.CourseDetailDTO;
 import com.dtl.DTO.CourseListDTO;
+import com.dtl.DTO.CourseProgressDTO;
 import com.dtl.pojo.Course;
+import com.dtl.pojo.CourseProgress;
 import com.dtl.pojo.User;
 import com.dtl.services.CourseProgressService;
 import com.dtl.services.CourseService;
@@ -42,6 +44,8 @@ public class ApiCourseController {
     @Autowired
     private UserService userService;
     @Autowired
+    private CourseProgressService courseProgressService;
+    @Autowired
     private MessageSource messageSource;
 
     @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +67,7 @@ public class ApiCourseController {
                         }
                         return new CourseListDTO(course, isEnrolled);
                     }).collect(Collectors.toList());
-            
+
             response.put("data", coursesList);
             response.put("count", coursesList.size());
 
@@ -82,7 +86,7 @@ public class ApiCourseController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User userDetail = user == null ? new User() : this.userService.getUserByUsername(user.getName());
+            User userDetail = user == null ? null : this.userService.getUserByUsername(user.getName());
             Course course = this.courseService.getCourseById(id);
             boolean isEnrolled = false;
             if (userDetail != null && userDetail.getId() != null) {
@@ -92,6 +96,38 @@ public class ApiCourseController {
             CourseDetailDTO courseDetail = new CourseDetailDTO(course, isEnrolled);
 
             response.put("data", courseDetail);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            response.put("error", messageSource.getMessage("course.notFound.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/{courseId}/progress", produces = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
+    public ResponseEntity<Object> getCourseProgress(@PathVariable(value = "courseId") int courseId, Principal user, Locale locale) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            User userDetail = this.userService.getUserByUsername(user.getName());
+            Course course = this.courseService.getCourseById(courseId);
+
+            if (!this.courseService.hasEnrolled(course, userDetail)) {
+                response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            Integer totalCourseContent = this.courseService.countContentInCourse(courseId);
+            CourseProgress progress = this.courseProgressService.getCourseProgress(userDetail.getId(), courseId);
+
+            response.put("data", new CourseProgressDTO(totalCourseContent, progress.getLessonCompleteCount()));
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (EntityNotFoundException ex) {
