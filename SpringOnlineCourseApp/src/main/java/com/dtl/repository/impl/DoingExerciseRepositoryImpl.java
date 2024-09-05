@@ -45,9 +45,9 @@ public class DoingExerciseRepositoryImpl implements DoingExerciseRepository {
     @Override
     public DoingExercise getDoingExerciseById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        
+
         DoingExercise exercise = s.get(DoingExercise.class, id);
-        if(exercise == null) {
+        if (exercise == null) {
             throw new EntityNotFoundException("doingExercise.notFound.errMsg");
         }
 
@@ -78,9 +78,8 @@ public class DoingExerciseRepositoryImpl implements DoingExerciseRepository {
 
         try {
             return s.createQuery(q).getSingleResult();
-        } catch (NoResultException e) {
+        } catch (NoResultException ex) {
             return null;
         }
     }
-
 }

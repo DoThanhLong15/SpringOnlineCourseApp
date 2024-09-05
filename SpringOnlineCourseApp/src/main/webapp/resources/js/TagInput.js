@@ -6,9 +6,9 @@ const searchContainer = document.getElementById('search-container');
 document.addEventListener('DOMContentLoaded', () => {
 
     tagInput.addEventListener('keyup', async (event) => {
-        let data = await tagSearch(tagInput.value);
-        if (data !== null && data !== []) {
-            renderList(data);
+        let res = await tagSearch(tagInput.value);
+        if (res.data !== null && res.data !== []) {
+            renderList(res.data);
         }
     });
 });

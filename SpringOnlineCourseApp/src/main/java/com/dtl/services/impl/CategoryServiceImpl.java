@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  * @author LONG
  */
 @Service
-public class CatogoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
     private static final int PAGE_SIZE = 10;
     @Autowired
@@ -45,7 +45,7 @@ public class CatogoryServiceImpl implements CategoryService {
 
     @Override
     public int getPageSize() {
-        return CatogoryServiceImpl.PAGE_SIZE;
+        return CategoryServiceImpl.PAGE_SIZE;
     }
 
     @Override

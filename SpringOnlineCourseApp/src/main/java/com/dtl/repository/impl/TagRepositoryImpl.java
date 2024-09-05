@@ -41,13 +41,19 @@ public class TagRepositoryImpl implements TagRepository {
         Root root = q.from(Tag.class);
         q.select(root);
 
-        if (params != null) {
+        String page = "1";
+        if (params != null && !params.isEmpty()) {
             List<Predicate> predicates = new ArrayList<>();
+            
             String kw = params.get("q");
-
             if (kw != null && !kw.isEmpty()) {
                 Predicate p1 = b.like(root.get("name"), String.format("%%%s%%", kw));
                 predicates.add(p1);
+            }
+            
+            String paramPage = params.get("page");
+            if (paramPage != null && !paramPage.isEmpty()) {
+                page = paramPage;
             }
 
             q.where(predicates.toArray(Predicate[]::new));
@@ -57,15 +63,11 @@ public class TagRepositoryImpl implements TagRepository {
 
         countTags = query.getResultList().size();
 
-        if (params != null) {
-            String page = params.get("page") != null && !params.get("page").isEmpty() ? params.get("page") : "1";
+        int p = Integer.parseInt(page);
+        int start = (p - 1) * pageSize;
 
-            int p = Integer.parseInt(page);
-            int start = (p - 1) * pageSize;
-
-            query.setFirstResult(start);
-            query.setMaxResults(pageSize);
-        }
+        query.setFirstResult(start);
+        query.setMaxResults(pageSize);
 
         return query.getResultList();
     }

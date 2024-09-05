@@ -19,4 +19,9 @@ public interface LessonRepository {
     Lesson getLessonById(int id);
 
     void saveLesson(Lesson lesson);
+
+    void deleteLesson(Lesson lesson);
+
+    void deleteLesson(int lessonId);
+
 }

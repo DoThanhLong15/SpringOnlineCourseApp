@@ -50,7 +50,7 @@ public class LessonContentRepositoryImpl implements LessonContentRepository {
         Session s = this.factory.getObject().getCurrentSession();
 
         LessonContent lessonContent = s.get(LessonContent.class, id);
-        if(lessonContent == null) {
+        if (lessonContent == null) {
             throw new EntityNotFoundException("lessonContent.notFound.errMsg");
         }
 
@@ -84,6 +84,21 @@ public class LessonContentRepositoryImpl implements LessonContentRepository {
         Long count = s.createQuery(q).getSingleResult();
 
         return count > 0;
+    }
+
+    @Override
+    public void deleteLessonContent(LessonContent lessonContent) {
+        Session s = this.factory.getObject().getCurrentSession();
+
+        s.delete(lessonContent);
+    }
+
+    @Override
+    public void deleteLessonContent(int lessonContentId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        LessonContent lessonContent = this.getLessonContentById(lessonContentId);
+
+        s.delete(lessonContent);
     }
 
 }

@@ -5,6 +5,7 @@
 package com.dtl.controllers;
 
 import com.dtl.DTO.LessonDetailDTO;
+import com.dtl.components.ErrorResponseUtil;
 import com.dtl.pojo.Course;
 import com.dtl.pojo.Lesson;
 import com.dtl.pojo.User;
@@ -15,19 +16,18 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,7 +47,7 @@ public class ApiLessonController {
     @Autowired
     private CourseService courseService;
     @Autowired
-    private MessageSource messageSource;
+    private ErrorResponseUtil errorResponseUtil;
 
     @GetMapping("/{lessonId}")
     @CrossOrigin
@@ -57,34 +57,17 @@ public class ApiLessonController {
         Map<String, Object> response = new HashMap<>();
 
         User userDetail = this.userService.getUserByUsername(user.getName());
-        
         Course course = this.courseService.getCourseById(courseId);
-        if(course == null){
-            response.put("error", messageSource.getMessage("course.notFound.errMsg", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
 
         if (!this.courseService.isCourseLecturer(course, userDetail)
                 && !this.courseService.hasEnrolled(course, userDetail)) {
-            response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
-        try {
-            Lesson lesson = this.lessonService.getLessonById(lessonId);
-            response.put("data", new LessonDetailDTO(lesson));
+        response.put("data", new LessonDetailDTO(lesson));
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
-        } catch (EntityNotFoundException ex) {
-            System.out.println(ex.getMessage());
-            response.put("error", messageSource.getMessage("lesson.notFound.errMsg", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/")
@@ -95,46 +78,76 @@ public class ApiLessonController {
 
         Map<String, Object> response = new HashMap<>();
         User userDetail = this.userService.getUserByUsername(user.getName());
-        
         Course course = this.courseService.getCourseById(courseId);
-        if(course == null){
-            response.put("error", messageSource.getMessage("course.notFound.errMsg", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
 
         if (!this.courseService.isCourseLecturer(course, userDetail)) {
-            response.put("error", messageSource.getMessage("user.permission.deny", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
         if (bindingResult.hasErrors()) {
-            response.put("error", new HashMap<String, String>());
-            Map<String, String> errors = (Map<String, String>) response.get("error");
-
+            Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            response.put("error", errors);
+            
+            return this.errorResponseUtil.buildErrorResponse(response, locale);
         }
 
-        try {
-            Map<String, String> params = new HashMap<>();
-            params.put("title", lesson.getTitle());
-            params.put("courseId", String.valueOf(courseId));
-            if (!this.lessonService.getLessons(params).isEmpty()) {
-                response.put("error", messageSource.getMessage("lesson.title.exist.errMsg", null, locale));
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-
-            this.lessonService.saveLesson(lesson);
-
-            return new ResponseEntity<>(HttpStatus.CREATED);
-
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            response.put("error", messageSource.getMessage("system.errMsg", null, locale));
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        Map<String, String> params = new HashMap<>();
+        params.put("title", lesson.getTitle());
+        params.put("courseId", String.valueOf(courseId));
+        
+        if (!this.lessonService.getLessons(params).isEmpty()) {
+            return this.errorResponseUtil.buildErrorResponse("lesson.title.exist.errMsg", locale);
         }
+
+        lesson.setCourseId(course);
+        this.lessonService.saveLesson(lesson);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    
+    @PutMapping("/{contentId}")
+    @CrossOrigin
+    public ResponseEntity<Object> editLesson(@Valid @RequestBody Lesson newLesson,Locale locale, Principal user,
+            @PathVariable(value = "courseId") int courseId,
+            @PathVariable(value = "lessonId") int lessonId,
+            @PathVariable(value = "contentId") int contentId) {
+
+        User userDetail = this.userService.getUserByUsername(user.getName());
+        Course course = this.courseService.getCourseById(courseId);
+        Lesson oldLesson = this.lessonService.getLessonById(lessonId);
+        
+        if(!this.courseService.isCourseLecturer(course, userDetail)){
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
+        }
+
+        if(newLesson.getTitle() != null && !newLesson.getTitle().isEmpty()){
+            oldLesson.setTitle(oldLesson.getTitle());
+        }
+        
+        this.lessonService.saveLesson(oldLesson);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    @DeleteMapping("/{lessonId}")
+    @CrossOrigin
+    public ResponseEntity<Object> deleteLesson(Locale locale, Principal user,
+            @PathVariable(value = "courseId") int courseId,
+            @PathVariable(value = "lessonId") int lessonId) {
+
+        User userDetail = this.userService.getUserByUsername(user.getName());
+        Course course = this.courseService.getCourseById(courseId);
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        
+        if(!this.courseService.isCourseLecturer(course, userDetail)){
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
+        }
+        
+        this.lessonService.deleteLesson(lesson);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

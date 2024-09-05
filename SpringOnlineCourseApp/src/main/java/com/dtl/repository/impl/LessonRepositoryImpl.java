@@ -40,7 +40,7 @@ public class LessonRepositoryImpl implements LessonRepository {
         Root root = q.from(Lesson.class);
         q.select(root);
 
-        if (params != null) {
+        if (params != null && !params.isEmpty()) {
             List<Predicate> predicates = new ArrayList<>();
 
             String title = params.get("title");
@@ -66,8 +66,8 @@ public class LessonRepositoryImpl implements LessonRepository {
         Session s = this.factory.getObject().getCurrentSession();
 
         Lesson lesson = s.get(Lesson.class, id);
-        
-        if(lesson == null){
+
+        if (lesson == null) {
             throw new EntityNotFoundException("lesson.notFound.errMsg");
         }
 
@@ -75,12 +75,26 @@ public class LessonRepositoryImpl implements LessonRepository {
     }
 
     @Override
-    public void saveLesson(Lesson lesson) {  
+    public void saveLesson(Lesson lesson) {
         Session s = this.factory.getObject().getCurrentSession();
         if (lesson.getId() != null) {
             s.update(lesson);
         } else {
             s.save(lesson);
         }
+    }
+
+    @Override
+    public void deleteLesson(Lesson lesson) {
+        Session s = this.factory.getObject().getCurrentSession();
+        s.delete(lesson);
+    }
+
+    @Override
+    public void deleteLesson(int lessonId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Lesson lesson = this.getLessonById(lessonId);
+
+        s.delete(lesson);
     }
 }

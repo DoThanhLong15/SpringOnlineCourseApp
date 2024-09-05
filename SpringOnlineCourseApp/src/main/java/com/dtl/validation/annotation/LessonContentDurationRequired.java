@@ -20,7 +20,10 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = LessonContentDurationRequiredValidator.class)
 public @interface LessonContentDurationRequired {
-     String message() default "";
+
+    String message() default "{lessonContent.duration.notNull.errMsg}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

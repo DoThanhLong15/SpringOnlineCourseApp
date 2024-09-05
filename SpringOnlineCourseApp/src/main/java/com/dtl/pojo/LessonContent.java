@@ -13,6 +13,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -59,7 +60,7 @@ public class LessonContent implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Basic(optional = false)
-    @NotNull
+    @NotNull(message = "{lessonContent.title.notNull.errMsg}")
     @Size(min = 1, max = 50, message = "{lessonContent.title.notNull.errMsg}")
     @Column(name = "title")
     private String title;
@@ -79,7 +80,7 @@ public class LessonContent implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
     @JoinColumn(name = "content_type_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @NotNull(message = "{lessonContent.contentTypeId.notNull.errMsg}")
     private ContentType contentTypeId;
     @JoinColumn(name = "lesson_id", referencedColumnName = "id")
