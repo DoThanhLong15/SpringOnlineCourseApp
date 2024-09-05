@@ -130,7 +130,6 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "lecturerId")
     @JsonIgnore
     private Collection<Course> courseCollection;
-//    @NotNull(message = "{user.userRoleId.notNull.errMsg}")
     @JoinColumn(name = "user_role_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     @JsonIgnore

@@ -4,12 +4,14 @@
  */
 package com.dtl.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,7 +48,8 @@ public class Category implements Serializable {
     @Size(min = 1, max = 50, message = "{category.name.notNull.errMsg}")
     @Column(name = "name")
     private String name;
-    @OneToMany(mappedBy = "categoryId", cascade = CascadeType.PERSIST, orphanRemoval = false)
+    @JsonIgnore
+    @OneToMany(mappedBy = "categoryId", cascade = CascadeType.PERSIST, orphanRemoval = false, fetch = FetchType.LAZY)
     private Collection<Course> courseCollection;
 
     public Category() {

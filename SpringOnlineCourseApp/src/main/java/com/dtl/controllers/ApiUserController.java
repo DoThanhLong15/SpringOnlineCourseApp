@@ -4,6 +4,8 @@
  */
 package com.dtl.controllers;
 
+import com.dtl.DTO.UserDTO;
+import com.dtl.components.ErrorResponseUtil;
 import com.dtl.components.JwtService;
 import com.dtl.pojo.User;
 import com.dtl.services.UserRoleService;
@@ -14,7 +16,6 @@ import java.util.Locale;
 import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class ApiUserController {
     @Autowired
     private UserRoleService userRoleService;
     @Autowired
-    private MessageSource messageSource;
+    private ErrorResponseUtil errorResponseUtil;
 
     @PostMapping("/login")
     @CrossOrigin
@@ -56,11 +57,7 @@ public class ApiUserController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        response.put("error", new HashMap<String, String>());
-        Map<String, String> errors = (Map<String, String>) response.get("error");
-        errors.put("login", messageSource.getMessage("user.login.fail.errMsg", null, locale));
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return this.errorResponseUtil.buildErrorResponse("user.login.fail.errMsg", locale);
     }
 
     @PostMapping("/register")
@@ -68,41 +65,31 @@ public class ApiUserController {
     public ResponseEntity<Object> register(@Valid @RequestBody User user, BindingResult bindingResult, Locale locale) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("error", new HashMap<String, String>());
-        Map<String, String> errors = (Map<String, String>) response.get("error");
-
         if (bindingResult.hasErrors()) {
-
+            Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            response.put("error", errors);
+            
+            return this.errorResponseUtil.buildErrorResponse(response, locale);
         }
 
-        try {
-            if (this.userService.getUserByUsername(user.getUsername()) != null) {
-                errors.put("username", messageSource.getMessage("user.username.exist.errMsg", null, locale));
-
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-
-            // userRoleId = 2 -> ROLE_LEARNER
-            user.setUserRoleId(this.userRoleService.getUserRoleById(2));
-            this.userService.addOrUpdateUser(user);
-
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            errors.put("error", messageSource.getMessage("system.errMsg", null, locale));
-            return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (this.userService.getUserByUsername(user.getUsername()) != null) {
+            return this.errorResponseUtil.buildErrorResponse("user.username.exist.errMsg", locale);
         }
+
+        // userRoleId = 2 -> ROLE_LEARNER
+        user.setUserRoleId(this.userRoleService.getUserRoleById(2));
+        this.userService.addOrUpdateUser(user);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/users/current-user", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<User> getCurrentUser(Principal user) {
-        User u = this.userService.getUserByUsername(user.getName());
+    public ResponseEntity<Object> getCurrentUser(Principal user) {
+        UserDTO u = new UserDTO(this.userService.getUserByUsername(user.getName()));
 
         return new ResponseEntity<>(u, HttpStatus.OK);
     }

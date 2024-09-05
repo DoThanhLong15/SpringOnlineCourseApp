@@ -17,17 +17,22 @@ public class LessonContentDurationRequiredValidator implements ConstraintValidat
 
     @Override
     public void initialize(LessonContentDurationRequired constraintAnnotation) {
-        
+
     }
 
     @Override
     public boolean isValid(LessonContent lessonContent, ConstraintValidatorContext context) {
         if (lessonContent.getContentTypeId().getIsRequired()) {
-            if(lessonContent.getDuration() == null || lessonContent.getDuration() <= 0)   
-               return false;
+            if (lessonContent.getDuration() == null || lessonContent.getDuration() <= 0) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+                        .addPropertyNode("duration")
+                        .addConstraintViolation();
+                return false;
+            }
         }
 
         return true;
     }
-    
+
 }

@@ -46,7 +46,7 @@ public class CourseProgressRepositoryImpl implements CourseProgressRepository {
         Session s = this.factory.getObject().getCurrentSession();
 
         CourseProgress progress = s.get(CourseProgress.class, progressId);
-        if(progress == null){
+        if (progress == null) {
             throw new EntityNotFoundException("courseProgress.notFound.errMsg");
         }
 
@@ -63,12 +63,12 @@ public class CourseProgressRepositoryImpl implements CourseProgressRepository {
 
         List<Predicate> predicates = new ArrayList<>();
 
-        if (userId != -1) {
+        if (userId > 0) {
             Predicate p = b.equal(root.get("learnerId"), userId);
             predicates.add(p);
         }
 
-        if (courseId != -1) {
+        if (courseId > 0) {
             Predicate p = b.equal(root.get("courseId"), courseId);
             predicates.add(p);
         }
@@ -77,9 +77,8 @@ public class CourseProgressRepositoryImpl implements CourseProgressRepository {
 
         try {
             return s.createQuery(q).getSingleResult();
-        } catch (NoResultException e) {
+        } catch (NoResultException ex) {
             return null;
         }
     }
-
 }

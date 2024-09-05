@@ -4,11 +4,10 @@
  */
 package com.dtl.controllers;
 
-import com.dtl.pojo.Tag;
-import com.dtl.services.TagService;
+import com.dtl.pojo.Category;
+import com.dtl.services.CategoryService;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,19 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
  * @author LONG
  */
 @RestController
-@RequestMapping("/api/tags")
-@CrossOrigin
-public class ApiTagController {
+@RequestMapping("/api/categories")
+public class ApiCategoryController {
 
     @Autowired
-    private TagService tagService;
+    private CategoryService categoryService;
 
     @GetMapping("/")
-    public ResponseEntity<Object> list(@RequestParam Map<String, String> params, Locale locale) {
-
+    @CrossOrigin
+    public ResponseEntity<Object> getCategoryList(@RequestParam Map<String, String> params) {
         Map<String, Object> response = new HashMap<>();
-        List<Tag> tags = this.tagService.getTags(params);
+
+        List<Category> categoryList = this.categoryService.getCategories(params);
         
+        System.out.println(params);
+
         String page = "1";
         String keyword = "";
         if (params != null && !params.isEmpty()) {
@@ -50,16 +51,15 @@ public class ApiTagController {
                 keyword = paramKeyword;
             }
         }
-        
-        int totalTag = this.tagService.countTags();
-        
-        response.put("data", tags);
+
+        long totalCategory = this.categoryService.countCategories();
+
+        response.put("data", categoryList);
         response.put("page", page);
-        response.put("count", tags.size());
         response.put("keyword", keyword);
-        response.put("total", totalTag);
+        response.put("count", categoryList.size());
+        response.put("total", totalCategory);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
-
     }
 }

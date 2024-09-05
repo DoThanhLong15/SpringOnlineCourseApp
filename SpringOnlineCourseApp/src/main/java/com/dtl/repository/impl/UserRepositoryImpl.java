@@ -55,7 +55,8 @@ public class UserRepositoryImpl implements UserRepository {
         Root root = q.from(User.class);
         q.select(root);
 
-        if (params != null) {
+        String page = "1";
+        if (params != null && !params.isEmpty()) {
             List<Predicate> predicates = new ArrayList<>();
             String kw = params.get("q");
             if (kw != null && !kw.isEmpty()) {
@@ -69,21 +70,21 @@ public class UserRepositoryImpl implements UserRepository {
                 predicates.add(p2);
             }
 
+            String paramPage = params.get("page");
+            if (paramPage != null && !paramPage.isEmpty()) {
+                page = paramPage;
+            }
+
             q.where(predicates.toArray(Predicate[]::new));
         }
 
         Query query = s.createQuery(q);
 
-        if (params != null) {
-            String page = params.get("page");
-            if (page != null && !page.isEmpty()) {
-                int p = Integer.parseInt(page);
-                int start = (p - 1) * PAGE_SIZE;
+        int p = Integer.parseInt(page);
+        int start = (p - 1) * PAGE_SIZE;
 
-                query.setFirstResult(start);
-                query.setMaxResults(PAGE_SIZE);
-            }
-        }
+        query.setFirstResult(start);
+        query.setMaxResults(PAGE_SIZE);
 
         return query.getResultList();
     }
@@ -101,12 +102,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User getUserById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        
+
         User user = s.get(User.class, id);
-        if(user == null) {
+        if (user == null) {
             throw new EntityNotFoundException("user.notFound.deny");
         }
-        
+
         return user;
     }
 }

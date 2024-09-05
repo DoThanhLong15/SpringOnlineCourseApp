@@ -4,8 +4,6 @@
  */
 package com.dtl.DTO;
 
-import com.dtl.pojo.Cart;
-import com.dtl.pojo.RegisterDetail;
 import com.dtl.pojo.RegisterOrder;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class RegisterOrderDetailDTO extends RegisterOrderListDTO {
 
-    private List<CartDTO> courseEnrollList;
+    private List<OrderDetailListDTO> courseEnrollList;
 
     public RegisterOrderDetailDTO() {
         super();
@@ -25,21 +23,21 @@ public class RegisterOrderDetailDTO extends RegisterOrderListDTO {
     public RegisterOrderDetailDTO(RegisterOrder registerOrder) {
         super(registerOrder);
         this.courseEnrollList = registerOrder.getRegisterDetailCollection().stream()
-                .map(order -> new CartDTO(order.getId(), registerOrder.getLearnerId().getId(), order.getCourseId()))
+                .map(order -> new OrderDetailListDTO(order.getId(), registerOrder.getLearnerId().getId(), order.getCourseId()))
                 .collect(Collectors.toList());
     }
 
     /**
      * @return the cartList
      */
-    public List<CartDTO> getCartList() {
+    public List<OrderDetailListDTO> getCartList() {
         return courseEnrollList;
     }
 
     /**
      * @param courseEnrollList the cartList to set
      */
-    public void setCartList(List<CartDTO> courseEnrollList) {
+    public void setCartList(List<OrderDetailListDTO> courseEnrollList) {
         this.courseEnrollList = courseEnrollList;
     }
 }

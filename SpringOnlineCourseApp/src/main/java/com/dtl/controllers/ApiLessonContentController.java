@@ -19,21 +19,23 @@ import com.dtl.services.DoingExerciseService;
 import com.dtl.services.LessonContentService;
 import com.dtl.services.LessonService;
 import com.dtl.services.UserService;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,8 +50,6 @@ public class ApiLessonContentController {
 
     @Autowired
     private LessonContentService lessonContentService;
-    @Autowired
-    private MessageSource messageSource;
     @Autowired
     private UserService userService;
     @Autowired
@@ -107,11 +107,12 @@ public class ApiLessonContentController {
 
         Map<String, Object> response = new HashMap<>();
         if (bindingResult.hasErrors()) {
-            response.put("error", new HashMap<>());
-            Map<String, String> errors = (Map<String, String>) response.get("error");
+            Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
+            response.put("error", errors);
+
             return this.errorResponseUtil.buildErrorResponse(response, locale);
         }
 
@@ -119,11 +120,60 @@ public class ApiLessonContentController {
             return this.errorResponseUtil.buildErrorResponse("lessonContent.title.exist.errMsg", locale);
         }
 
-        lessonContent.setLessonId(new Lesson());
-        lessonContent.getLessonId().setId(lessonId);
+        lessonContent.setLessonId(lesson);
         this.lessonContentService.saveLessonContent(lessonContent);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{contentId}")
+    @CrossOrigin
+    public ResponseEntity<Object> deleteLessonContent(Locale locale, Principal user,
+            @PathVariable(value = "courseId") int courseId,
+            @PathVariable(value = "lessonId") int lessonId,
+            @PathVariable(value = "contentId") int contentId) {
+
+        User userDetail = this.userService.getUserByUsername(user.getName());
+        Course course = this.courseService.getCourseById(courseId);
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        LessonContent content = this.lessonContentService.getLessonContentById(contentId);
+
+        if (!this.courseService.isCourseLecturer(course, userDetail)) {
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
+        }
+
+        this.lessonContentService.deleteLessonContent(content);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    @PutMapping("/{contentId}")
+    @CrossOrigin
+    public ResponseEntity<Object> editLessonContent(@Valid @RequestBody LessonContent newLessonContent,Locale locale, Principal user,
+            @PathVariable(value = "courseId") int courseId,
+            @PathVariable(value = "lessonId") int lessonId,
+            @PathVariable(value = "contentId") int contentId) {
+
+        User userDetail = this.userService.getUserByUsername(user.getName());
+        Course course = this.courseService.getCourseById(courseId);
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        LessonContent oldLessonContent = this.lessonContentService.getLessonContentById(contentId);
+        
+        if(!this.courseService.isCourseLecturer(course, userDetail)){
+            return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
+        }
+
+        if(newLessonContent.getTitle() != null && !newLessonContent.getTitle().isEmpty()){
+            oldLessonContent.setTitle(newLessonContent.getTitle());
+        }
+        
+        if(newLessonContent.getContent() != null && !newLessonContent.getContent().isEmpty()){
+            oldLessonContent.setTitle(newLessonContent.getContent());
+        }
+        
+        this.lessonContentService.saveLessonContent(oldLessonContent);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // helper method
@@ -139,6 +189,8 @@ public class ApiLessonContentController {
                 exercise = new DoingExercise();
                 exercise.setLessonContentId(content);
                 exercise.setLearnerId(userDetail);
+                exercise.setContent("");
+                exercise.setScore(BigDecimal.TEN);
                 exercise.setExerciseStatusId(new ExerciseStatus(3)); // DONE
 
                 doingExerciseServise.saveDoingExercise(exercise);

@@ -16,8 +16,13 @@ public interface LessonContentRepository {
     List<LessonContent> getLessonContent(int lessonId);
 
     LessonContent getLessonContentById(int id);
-    
+
     void saveLessonContent(LessonContent lessonContent);
-    
+
     boolean hasLessonContent(int lessonId, String title);
+
+    void deleteLessonContent(LessonContent lessonContent);
+
+    void deleteLessonContent(int lessonContentId);
+
 }

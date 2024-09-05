@@ -45,7 +45,8 @@ public class CourseRepositoryImpl implements CourseRepository {
         Root root = q.from(Course.class);
         q.select(root);
 
-        if (params != null) {
+        String page = "1";
+        if (params != null && !params.isEmpty()) {
             List<Predicate> predicates = new ArrayList<>();
             String kw = params.get("q");
             if (kw != null && !kw.isEmpty()) {
@@ -70,6 +71,11 @@ public class CourseRepositoryImpl implements CourseRepository {
                 Predicate p4 = b.equal(root.get("categoryId"), Integer.parseInt(cateId));
                 predicates.add(p4);
             }
+            
+            String paramPage = params.get("page");
+            if (paramPage != null && !paramPage.isEmpty()) {
+                page = paramPage;
+            }
 
             q.where(predicates.toArray(Predicate[]::new));
         }
@@ -78,15 +84,11 @@ public class CourseRepositoryImpl implements CourseRepository {
 
         countCourses = query.getResultList().size();
 
-        if (params != null) {
-            String page = params.get("page") != null && !params.get("page").isEmpty() ? params.get("page") : "1";
+        int p = Integer.parseInt(page);
+        int start = (p - 1) * pageSize;
 
-            int p = Integer.parseInt(page);
-            int start = (p - 1) * pageSize;
-
-            query.setFirstResult(start);
-            query.setMaxResults(pageSize);
-        }
+        query.setFirstResult(start);
+        query.setMaxResults(pageSize);
 
         return query.getResultList();
     }
@@ -105,11 +107,11 @@ public class CourseRepositoryImpl implements CourseRepository {
     public Course getCourseById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
         Course course = s.get(Course.class, id);
-                
-        if(course == null){
+
+        if (course == null) {
             throw new EntityNotFoundException("course.notFound.errMsg");
         }
-        
+
         return course;
     }
 
@@ -139,7 +141,6 @@ public class CourseRepositoryImpl implements CourseRepository {
 
         Join<Course, Lesson> lessonJoin = root.join("lessonCollection");
         Join<Lesson, LessonContent> contentJoin = lessonJoin.join("lessonContentCollection");
-
 
         query.where(b.equal(root.get("id"), courseId));
 

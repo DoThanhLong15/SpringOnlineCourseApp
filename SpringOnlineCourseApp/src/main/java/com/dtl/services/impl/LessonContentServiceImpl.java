@@ -40,5 +40,15 @@ public class LessonContentServiceImpl implements LessonContentService{
     public boolean hasLessonContent(int lessonId, String title) {
         return this.lessonContentRepo.hasLessonContent(lessonId, title);
     }
+
+    @Override
+    public void deleteLessonContent(LessonContent lessonContent) {
+        this.lessonContentRepo.deleteLessonContent(lessonContent);
+    }
+
+    @Override
+    public void deleteLessonContent(int lessonContentId) {
+        this.lessonContentRepo.deleteLessonContent(lessonContentId);
+    }
     
 }

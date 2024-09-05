@@ -70,26 +70,27 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/api/categories/**").permitAll();
-        
+
         http.authorizeRequests()
                 .antMatchers("/api/courses/**").permitAll();
-        
+
         http.authorizeRequests()
                 .antMatchers("/api/**/progress/**").access("hasRole('ROLE_LEARNER')");
-        
+
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**/lessons/**").access("hasRole('ROLE_LECTURER')")
                 .antMatchers("/api/**/lessons/**")
                 .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
-        
+
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**/contents/**").access("hasRole('ROLE_LECTURER')")
                 .antMatchers("/api/**/contents/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
-        
+
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**/carts/**").access("hasRole('ROLE_LEARNER')")
+                .antMatchers(HttpMethod.DELETE, "/api/**/carts/**").access("hasRole('ROLE_LEARNER')")
                 .antMatchers("/api/**/carts/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
-        
+
         http.authorizeRequests()
                 .antMatchers("/api/**/register-orders/**").access("hasRole('ROLE_LEARNER')");
 
