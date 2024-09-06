@@ -9,7 +9,7 @@ import com.dtl.pojo.Course;
 import com.dtl.repository.CategoryRepository;
 import com.dtl.repository.CourseRepository;
 import com.dtl.services.CategoryService;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(int id) {
-        Map<String, String> param = new Hashtable<>();
+        Map<String, String> param = new HashMap<>();
         param.put("cateId", String.valueOf(id));
 
         List<Course> courses = this.courseRepo.getCourse(param, 1);

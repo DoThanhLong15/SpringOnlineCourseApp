@@ -6,10 +6,8 @@ package com.dtl.pojo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,13 +19,11 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -56,10 +52,8 @@ public class DoingExercise implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "score")
     private BigDecimal score;
-    @Lob
     @Size(max = 65535)
     @Column(name = "content")
     private String content;
@@ -71,17 +65,22 @@ public class DoingExercise implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     private Date updatedDate;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "doingExerciseId")
-    private Collection<ScoreLearnerExercise> scoreLearnerExerciseCollection;
     @JoinColumn(name = "exercise_status_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.EAGER)
     private ExerciseStatus exerciseStatusId;
     @JoinColumn(name = "lesson_content_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private LessonContent lessonContentId;
     @JoinColumn(name = "learner_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private User learnerId;
+    @Size(min = 1, max = 50)
+    @Column(name = "lecturer_comment")
+    private String lecturerComment;
+    @Column(name = "score_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date scoreDate;
 
     public DoingExercise() {
     }
@@ -128,15 +127,6 @@ public class DoingExercise implements Serializable {
 
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
-    }
-
-    @XmlTransient
-    public Collection<ScoreLearnerExercise> getScoreLearnerExerciseCollection() {
-        return scoreLearnerExerciseCollection;
-    }
-
-    public void setScoreLearnerExerciseCollection(Collection<ScoreLearnerExercise> scoreLearnerExerciseCollection) {
-        this.scoreLearnerExerciseCollection = scoreLearnerExerciseCollection;
     }
 
     public ExerciseStatus getExerciseStatusId() {
@@ -187,5 +177,33 @@ public class DoingExercise implements Serializable {
     public String toString() {
         return "com.dtl.pojo.DoingExercise[ id=" + id + " ]";
     }
-    
+
+    /**
+     * @return the lecturerComment
+     */
+    public String getLecturerComment() {
+        return lecturerComment;
+    }
+
+    /**
+     * @param lecturerComment the lecturerComment to set
+     */
+    public void setLecturerComment(String lecturerComment) {
+        this.lecturerComment = lecturerComment;
+    }
+
+    /**
+     * @return the scoreDate
+     */
+    public Date getScoreDate() {
+        return scoreDate;
+    }
+
+    /**
+     * @param scoreDate the scoreDate to set
+     */
+    public void setScoreDate(Date scoreDate) {
+        this.scoreDate = scoreDate;
+    }
+
 }

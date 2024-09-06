@@ -5,6 +5,7 @@
 package com.dtl.pojo;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 /**
  *
@@ -29,6 +35,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CourseProgress.findAll", query = "SELECT c FROM CourseProgress c"),
     @NamedQuery(name = "CourseProgress.findById", query = "SELECT c FROM CourseProgress c WHERE c.id = :id"),
     @NamedQuery(name = "CourseProgress.findByLessonCompleteCount", query = "SELECT c FROM CourseProgress c WHERE c.lessonCompleteCount = :lessonCompleteCount")})
+@DynamicInsert
+@DynamicUpdate
 public class CourseProgress implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,6 +53,12 @@ public class CourseProgress implements Serializable {
     @JoinColumn(name = "learner_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User learnerId;
+    @Column(name = "complete")
+    private Boolean isComplete;
+    @CreationTimestamp
+    @Column(name = "enroll_date", updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date enrollDate;
 
     public CourseProgress() {
     }
@@ -108,6 +122,34 @@ public class CourseProgress implements Serializable {
     @Override
     public String toString() {
         return "com.dtl.pojo.CourseProgress[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the isComplete
+     */
+    public Boolean getIsComplete() {
+        return isComplete;
+    }
+
+    /**
+     * @param isComplete the isComplete to set
+     */
+    public void setIsComplete(Boolean isComplete) {
+        this.isComplete = isComplete;
+    }
+
+    /**
+     * @return the enrollDate
+     */
+    public Date getEnrollDate() {
+        return enrollDate;
+    }
+
+    /**
+     * @param enrollDate the enrollDate to set
+     */
+    public void setEnrollDate(Date enrollDate) {
+        this.enrollDate = enrollDate;
     }
     
 }

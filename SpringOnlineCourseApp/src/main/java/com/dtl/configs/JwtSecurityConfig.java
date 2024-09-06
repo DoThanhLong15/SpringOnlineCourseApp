@@ -79,11 +79,21 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**/lessons/**").access("hasRole('ROLE_LECTURER')")
+                .antMatchers(HttpMethod.PUT, "/api/**/lessons/**").access("hasRole('ROLE_LECTURER')")
+                .antMatchers(HttpMethod.DELETE, "/api/**/lessons/**").access("hasRole('ROLE_LECTURER')")
                 .antMatchers("/api/**/lessons/**")
+                .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
+        
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/api/**/do-exercise/**").access("hasRole('ROLE_LEARNER')")
+                .antMatchers(HttpMethod.PUT, "/api/**/do-exercise/**").access("hasRole('ROLE_LECTURER')")
+                .antMatchers("/api/**/do-exercise/**")
                 .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
 
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/**/contents/**").access("hasRole('ROLE_LECTURER')")
+                .antMatchers(HttpMethod.PUT, "/api/**/contents/**").access("hasRole('ROLE_LECTURER')")
+                .antMatchers(HttpMethod.DELETE, "/api/**/contents/**").access("hasRole('ROLE_LECTURER')")
                 .antMatchers("/api/**/contents/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_LECTURER') or hasRole('ROLE_LEARNER')");
 
         http.authorizeRequests()

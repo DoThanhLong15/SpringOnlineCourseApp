@@ -13,29 +13,31 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 /**
  *
  * @author LONG
  */
 @Entity
-@Table(name = "score_learner_exercise")
+@Table(name = "content_learn")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "ScoreLearnerExercise.findAll", query = "SELECT s FROM ScoreLearnerExercise s"),
-    @NamedQuery(name = "ScoreLearnerExercise.findById", query = "SELECT s FROM ScoreLearnerExercise s WHERE s.id = :id"),
-    @NamedQuery(name = "ScoreLearnerExercise.findByCreatedDate", query = "SELECT s FROM ScoreLearnerExercise s WHERE s.createdDate = :createdDate"),
-    @NamedQuery(name = "ScoreLearnerExercise.findByUpdatedDate", query = "SELECT s FROM ScoreLearnerExercise s WHERE s.updatedDate = :updatedDate")})
-public class ScoreLearnerExercise implements Serializable {
+    @NamedQuery(name = "ContentLearn.findAll", query = "SELECT c FROM ContentLearn c"),
+    @NamedQuery(name = "ContentLearn.findById", query = "SELECT c FROM ContentLearn c WHERE c.id = :id"),
+    @NamedQuery(name = "ContentLearn.findByCreatedDate", query = "SELECT c FROM ContentLearn c WHERE c.createdDate = :createdDate")})
+@DynamicInsert
+@DynamicUpdate
+public class ContentLearn implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -43,24 +45,21 @@ public class ScoreLearnerExercise implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "comment")
-    private String comment;
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date createdDate;
-    @Column(name = "updated_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
-    @JoinColumn(name = "doing_exercise_id", referencedColumnName = "id")
+    @JoinColumn(name = "lesson_content_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private DoingExercise doingExerciseId;
+    private LessonContent lessonContentId;
+    @JoinColumn(name = "learner_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    private User learnerId;
 
-    public ScoreLearnerExercise() {
+    public ContentLearn() {
     }
 
-    public ScoreLearnerExercise(Integer id) {
+    public ContentLearn(Integer id) {
         this.id = id;
     }
 
@@ -72,14 +71,6 @@ public class ScoreLearnerExercise implements Serializable {
         this.id = id;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -88,20 +79,20 @@ public class ScoreLearnerExercise implements Serializable {
         this.createdDate = createdDate;
     }
 
-    public Date getUpdatedDate() {
-        return updatedDate;
+    public LessonContent getLessonContentId() {
+        return lessonContentId;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setLessonContentId(LessonContent lessonContentId) {
+        this.lessonContentId = lessonContentId;
     }
 
-    public DoingExercise getDoingExerciseId() {
-        return doingExerciseId;
+    public User getLearnerId() {
+        return learnerId;
     }
 
-    public void setDoingExerciseId(DoingExercise doingExerciseId) {
-        this.doingExerciseId = doingExerciseId;
+    public void setLearnerId(User learnerId) {
+        this.learnerId = learnerId;
     }
 
     @Override
@@ -114,10 +105,10 @@ public class ScoreLearnerExercise implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ScoreLearnerExercise)) {
+        if (!(object instanceof ContentLearn)) {
             return false;
         }
-        ScoreLearnerExercise other = (ScoreLearnerExercise) object;
+        ContentLearn other = (ContentLearn) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -126,7 +117,7 @@ public class ScoreLearnerExercise implements Serializable {
 
     @Override
     public String toString() {
-        return "com.dtl.pojo.ScoreLearnerExercise[ id=" + id + " ]";
+        return "com.dtl.pojo.ContentLearn[ id=" + id + " ]";
     }
     
 }

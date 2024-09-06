@@ -7,8 +7,11 @@ package com.dtl.controllers;
 import com.dtl.pojo.Course;
 import com.dtl.services.CategoryService;
 import com.dtl.services.CourseService;
+import com.dtl.services.CourseTagService;
+import com.dtl.services.LessonService;
 import com.dtl.services.UserService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -40,6 +43,10 @@ public class CourseController {
     private CategoryService categoryService;
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private LessonService lessonService;
+    @Autowired
+    private CourseTagService courseTagService;
     @Autowired
     private UserService userService;
 
@@ -76,6 +83,12 @@ public class CourseController {
         Course course = this.courseService.getCourseById(id);
         course.setCourseTagForm(new ArrayList<>());
         model.addAttribute("course", course);
+        
+        Map<String, String> params = new HashMap<>();
+        params.put("courseId", String.valueOf(id));
+        course.setLessonCollection(this.lessonService.getLessons(params));
+        
+        course.setCourseTagCollection(this.courseTagService.getCourseTags(id, -1));
 
         populateModelForCourseForm(model);
 

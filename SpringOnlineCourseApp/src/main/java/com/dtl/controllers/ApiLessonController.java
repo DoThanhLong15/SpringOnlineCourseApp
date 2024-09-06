@@ -10,6 +10,7 @@ import com.dtl.pojo.Course;
 import com.dtl.pojo.Lesson;
 import com.dtl.pojo.User;
 import com.dtl.services.CourseService;
+import com.dtl.services.LessonContentService;
 import com.dtl.services.LessonService;
 import com.dtl.services.UserService;
 import java.security.Principal;
@@ -47,6 +48,8 @@ public class ApiLessonController {
     @Autowired
     private CourseService courseService;
     @Autowired
+    private LessonContentService lessonContentService;
+    @Autowired
     private ErrorResponseUtil errorResponseUtil;
 
     @GetMapping("/{lessonId}")
@@ -58,12 +61,14 @@ public class ApiLessonController {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson lesson = this.lessonService.getLessonById(lessonId);
 
         if (!this.courseService.isCourseLecturer(course, userDetail)
                 && !this.courseService.hasEnrolled(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
+
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        lesson.setLessonContentCollection(this.lessonContentService.getLessonContent(lesson.getId()));
 
         response.put("data", new LessonDetailDTO(lesson));
 
@@ -90,14 +95,14 @@ public class ApiLessonController {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
             response.put("error", errors);
-            
+
             return this.errorResponseUtil.buildErrorResponse(response, locale);
         }
 
         Map<String, String> params = new HashMap<>();
         params.put("title", lesson.getTitle());
         params.put("courseId", String.valueOf(courseId));
-        
+
         if (!this.lessonService.getLessons(params).isEmpty()) {
             return this.errorResponseUtil.buildErrorResponse("lesson.title.exist.errMsg", locale);
         }
@@ -107,31 +112,32 @@ public class ApiLessonController {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
-    @PutMapping("/{contentId}")
+
+    @PutMapping("/{lessonId}")
     @CrossOrigin
-    public ResponseEntity<Object> editLesson(@Valid @RequestBody Lesson newLesson,Locale locale, Principal user,
+    public ResponseEntity<Object> editLesson(@Valid @RequestBody Lesson newLesson, 
+            Locale locale, Principal user,
             @PathVariable(value = "courseId") int courseId,
-            @PathVariable(value = "lessonId") int lessonId,
-            @PathVariable(value = "contentId") int contentId) {
+            @PathVariable(value = "lessonId") int lessonId) {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson oldLesson = this.lessonService.getLessonById(lessonId);
-        
-        if(!this.courseService.isCourseLecturer(course, userDetail)){
+
+        if (!this.courseService.isCourseLecturer(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
-        if(newLesson.getTitle() != null && !newLesson.getTitle().isEmpty()){
-            oldLesson.setTitle(oldLesson.getTitle());
+        Lesson oldLesson = this.lessonService.getLessonById(lessonId);
+
+        if (newLesson.getTitle() != null && !newLesson.getTitle().isEmpty()) {
+            oldLesson.setTitle(newLesson.getTitle());
         }
-        
+
         this.lessonService.saveLesson(oldLesson);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
     @DeleteMapping("/{lessonId}")
     @CrossOrigin
     public ResponseEntity<Object> deleteLesson(Locale locale, Principal user,
@@ -140,12 +146,14 @@ public class ApiLessonController {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson lesson = this.lessonService.getLessonById(lessonId);
-        
-        if(!this.courseService.isCourseLecturer(course, userDetail)){
+
+        if (!this.courseService.isCourseLecturer(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
-        
+
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        lesson.setLessonContentCollection(this.lessonContentService.getLessonContent(lesson.getId()));
+
         this.lessonService.deleteLesson(lesson);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

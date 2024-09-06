@@ -11,14 +11,16 @@ package com.dtl.DTO;
 public class CourseProgressDTO {
     private Integer totalCourseContent;
     private Integer completeContent;
+    private boolean complete;
     
     public CourseProgressDTO(){
         
     }
     
-    public CourseProgressDTO(Integer totalCourseContent, Integer completeContent){
+    public CourseProgressDTO(Integer totalCourseContent, Integer completeContent, boolean complete){
         this.totalCourseContent = totalCourseContent;
         this.completeContent = completeContent;
+        this.complete = complete;
     }
 
     /**
@@ -47,5 +49,19 @@ public class CourseProgressDTO {
      */
     public void setTotalCourseContent(Integer totalCourseContent) {
         this.totalCourseContent = totalCourseContent;
+    }
+
+    /**
+     * @return the complete
+     */
+    public boolean isComplete() {
+        return complete;
+    }
+
+    /**
+     * @param complete the complete to set
+     */
+    public void setComplete(boolean complete) {
+        this.complete = complete;
     }
 }

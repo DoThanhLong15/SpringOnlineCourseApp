@@ -6,20 +6,20 @@ package com.dtl.controllers;
 
 import com.dtl.DTO.LessonContentDetailDTO;
 import com.dtl.components.ErrorResponseUtil;
+import com.dtl.pojo.ContentLearn;
 import com.dtl.pojo.Course;
 import com.dtl.pojo.CourseProgress;
 import com.dtl.pojo.DoingExercise;
-import com.dtl.pojo.ExerciseStatus;
 import com.dtl.pojo.Lesson;
 import com.dtl.pojo.LessonContent;
 import com.dtl.pojo.User;
+import com.dtl.services.ContentLearnService;
 import com.dtl.services.CourseProgressService;
 import com.dtl.services.CourseService;
 import com.dtl.services.DoingExerciseService;
 import com.dtl.services.LessonContentService;
 import com.dtl.services.LessonService;
 import com.dtl.services.UserService;
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Locale;
@@ -57,6 +57,8 @@ public class ApiLessonContentController {
     @Autowired
     private DoingExerciseService doingExerciseServise;
     @Autowired
+    private ContentLearnService contentLearnService;
+    @Autowired
     private CourseProgressService courseProgressService;
     @Autowired
     private LessonService lessonService;
@@ -73,18 +75,27 @@ public class ApiLessonContentController {
         Map<String, Object> response = new HashMap<>();
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson lesson = this.lessonService.getLessonById(lessonId);
-        LessonContent content = this.lessonContentService.getLessonContentById(contentId);
-
         if (!this.courseService.hasEnrolled(course, userDetail)
                 && !this.courseService.isCourseLecturer(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        if (lesson.getCourseId().getId() != course.getId()) {
+            return this.errorResponseUtil.buildErrorResponse("lesson.notInCourse.errMsg", locale);
+        }
+
+        LessonContent content = this.lessonContentService.getLessonContentById(contentId);
+        if (content.getLessonId().getId() != lesson.getId()) {
+            return this.errorResponseUtil.buildErrorResponse("lessonContent.notInLesson.errMsg", locale);
+        }
+
         LessonContentDetailDTO lessonContent = new LessonContentDetailDTO(content);
         lessonContent.setHasLearn(false);
 
-        handleExercise(userDetail, content, lessonContent, course);
+        if (userDetail.getUserRoleId().getRole().equals("ROLE_LEARNER")) {
+            handleExercise(userDetail, content, lessonContent, course);
+        }
 
         response.put("data", lessonContent);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -99,10 +110,14 @@ public class ApiLessonContentController {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson lesson = this.lessonService.getLessonById(lessonId);
 
         if (!this.courseService.isCourseLecturer(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
+        }
+
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        if (lesson.getCourseId().getId() != course.getId()) {
+            return this.errorResponseUtil.buildErrorResponse("lesson.notInCourse.errMsg", locale);
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -135,42 +150,44 @@ public class ApiLessonContentController {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson lesson = this.lessonService.getLessonById(lessonId);
-        LessonContent content = this.lessonContentService.getLessonContentById(contentId);
 
         if (!this.courseService.isCourseLecturer(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        LessonContent content = this.lessonContentService.getLessonContentById(contentId);
+
         this.lessonContentService.deleteLessonContent(content);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    
+
     @PutMapping("/{contentId}")
     @CrossOrigin
-    public ResponseEntity<Object> editLessonContent(@Valid @RequestBody LessonContent newLessonContent,Locale locale, Principal user,
+    public ResponseEntity<Object> editLessonContent(@Valid @RequestBody LessonContent newLessonContent, Locale locale, Principal user,
             @PathVariable(value = "courseId") int courseId,
             @PathVariable(value = "lessonId") int lessonId,
             @PathVariable(value = "contentId") int contentId) {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
-        Lesson lesson = this.lessonService.getLessonById(lessonId);
-        LessonContent oldLessonContent = this.lessonContentService.getLessonContentById(contentId);
-        
-        if(!this.courseService.isCourseLecturer(course, userDetail)){
+
+        if (!this.courseService.isCourseLecturer(course, userDetail)) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
-        if(newLessonContent.getTitle() != null && !newLessonContent.getTitle().isEmpty()){
+        Lesson lesson = this.lessonService.getLessonById(lessonId);
+        LessonContent oldLessonContent = this.lessonContentService.getLessonContentById(contentId);
+
+        if (newLessonContent.getTitle() != null && !newLessonContent.getTitle().isEmpty()) {
             oldLessonContent.setTitle(newLessonContent.getTitle());
         }
-        
-        if(newLessonContent.getContent() != null && !newLessonContent.getContent().isEmpty()){
+
+        if (newLessonContent.getContent() != null && !newLessonContent.getContent().isEmpty()) {
             oldLessonContent.setTitle(newLessonContent.getContent());
         }
-        
+
         this.lessonContentService.saveLessonContent(oldLessonContent);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -178,26 +195,26 @@ public class ApiLessonContentController {
 
     // helper method
     private void handleExercise(User userDetail, LessonContent content, LessonContentDetailDTO lessonContent, Course course) {
-        DoingExercise exercise = doingExerciseServise.getDoingExercise(userDetail.getId(), content.getId());
-
-        if (exercise != null) {
-            if ("DONE".equals(exercise.getExerciseStatusId().getStatus())) {
-                lessonContent.setHasLearn(true);
+        if ("LESSON".equals(lessonContent.getContentType())) {
+            ContentLearn contentLearn = this.contentLearnService.getContentLearn(content.getId(), userDetail.getId());
+            if (contentLearn == null) {
+                contentLearn = new ContentLearn();
+                contentLearn.setLearnerId(userDetail);
+                contentLearn.setLessonContentId(content);
+                this.contentLearnService.saveContentLearn(contentLearn);
             }
-        } else {
-            if ("LESSON".equals(lessonContent.getContentType())) {
-                exercise = new DoingExercise();
-                exercise.setLessonContentId(content);
-                exercise.setLearnerId(userDetail);
-                exercise.setContent("");
-                exercise.setScore(BigDecimal.TEN);
-                exercise.setExerciseStatusId(new ExerciseStatus(3)); // DONE
 
-                doingExerciseServise.saveDoingExercise(exercise);
-
-                CourseProgress progress = courseProgressService.getCourseProgress(userDetail.getId(), course.getId());
+            CourseProgress progress = courseProgressService.getCourseProgress(userDetail.getId(), course.getId());
+            if (!progress.getIsComplete()) {
                 progress.setLessonCompleteCount(progress.getLessonCompleteCount() + 1);
-                courseProgressService.saveCourseProgress(progress);
+                this.courseService.checkCourseProgress(course, userDetail, progress, 0);
+            }
+
+            lessonContent.setHasLearn(true);
+        } else {
+            DoingExercise doingExercise = this.doingExerciseServise.getDoingExercise(userDetail.getId(), content.getId()); 
+            if (doingExercise != null && doingExercise.getExerciseStatusId().getStatus().equals("DONE")) {
+                lessonContent.setHasLearn(true);
             }
         }
     }

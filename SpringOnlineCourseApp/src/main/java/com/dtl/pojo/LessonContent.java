@@ -53,6 +53,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 @LessonContentDurationRequired(message = "{lessonContent.duration.notNull.errMsg}")
 public class LessonContent implements Serializable {
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lessonContentId")
+    private Collection<ContentLearn> contentLearnCollection;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -199,6 +202,15 @@ public class LessonContent implements Serializable {
     @Override
     public String toString() {
         return "com.dtl.pojo.LessonContent[ id=" + id + " ]";
+    }
+
+    @XmlTransient
+    public Collection<ContentLearn> getContentLearnCollection() {
+        return contentLearnCollection;
+    }
+
+    public void setContentLearnCollection(Collection<ContentLearn> contentLearnCollection) {
+        this.contentLearnCollection = contentLearnCollection;
     }
     
 }
