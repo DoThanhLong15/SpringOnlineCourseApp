@@ -60,6 +60,12 @@ import org.springframework.web.multipart.MultipartFile;
 @UserAvatarRequired(message = "{user.avatar.notValid.errMsg}")
 public class User implements Serializable {
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "learnerId")
+    private Collection<ContentLearn> contentLearnCollection;
+
+    @OneToMany(mappedBy = "learnerId")
+    private Collection<Certificate> certificateCollection;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -348,5 +354,23 @@ public class User implements Serializable {
      */
     public void setOldPassword(String oldPassword) {
         this.oldPassword = oldPassword;
+    }
+
+    @XmlTransient
+    public Collection<Certificate> getCertificateCollection() {
+        return certificateCollection;
+    }
+
+    public void setCertificateCollection(Collection<Certificate> certificateCollection) {
+        this.certificateCollection = certificateCollection;
+    }
+
+    @XmlTransient
+    public Collection<ContentLearn> getContentLearnCollection() {
+        return contentLearnCollection;
+    }
+
+    public void setContentLearnCollection(Collection<ContentLearn> contentLearnCollection) {
+        this.contentLearnCollection = contentLearnCollection;
     }
 }

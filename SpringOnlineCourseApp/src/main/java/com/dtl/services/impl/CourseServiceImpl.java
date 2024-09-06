@@ -6,13 +6,14 @@ package com.dtl.services.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.dtl.pojo.Certificate;
 import com.dtl.pojo.Course;
+import com.dtl.pojo.CourseProgress;
 import com.dtl.pojo.CourseTag;
 import com.dtl.pojo.User;
+import com.dtl.repository.CertificateRepository;
 import com.dtl.repository.CourseProgressRepository;
 import com.dtl.repository.CourseRepository;
-import com.dtl.repository.CourseTagRepository;
-import com.dtl.repository.LessonRepository;
 import com.dtl.repository.TagRepository;
 import com.dtl.services.CourseService;
 import java.io.IOException;
@@ -39,11 +40,9 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private TagRepository tagRepo;
     @Autowired
-    private CourseTagRepository courseTagRepo;
-    @Autowired
-    private LessonRepository lessonRepo;
-    @Autowired
     private CourseProgressRepository courseProgressRepo;
+    @Autowired
+    private CertificateRepository certificateRepo;
     @Autowired
     private Cloudinary cloudinary;
 
@@ -54,7 +53,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addOrUpdateCourse(Course course) {
-        if (!course.getFile().isEmpty()) {
+        if (course.getFile() != null && !course.getFile().isEmpty()) {
             try {
                 Map res = this.cloudinary.uploader().upload(course.getFile().getBytes(),
                         ObjectUtils.asMap("resource_type", "auto"));
@@ -84,13 +83,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course getCourseById(int id) {
         Course course = this.courseRepo.getCourseById(id);
-
-        Map<String, String> params = new HashMap<>();
-        params.put("courseId", String.valueOf(course.getId()));
-        course.setLessonCollection(this.lessonRepo.getLessons(params));
-
-        course.setCourseTagCollection(this.courseTagRepo.getCourseTags(id, -1));
-
         return course;
     }
 
@@ -122,5 +114,37 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Integer countContentInCourse(int courseId) {
         return this.courseRepo.countContentInCourse(courseId);
+    }
+
+    @Override
+    public void checkCourseProgress(Course course, User user, CourseProgress progress, int totalContent) {
+
+        int total = totalContent;
+        if (total <= 0) {
+            total = this.countContentInCourse(course.getId());
+        }
+
+        if (!progress.getIsComplete() && progress.getLessonCompleteCount() >= total) {
+            Map<String, String> params = new HashMap<>();
+            params.put("courseName", course.getTitle());
+            params.put("learnerId", String.valueOf(user.getId()));
+            List<Certificate> certificateList = this.certificateRepo.getCertificateList(params);
+
+            if (certificateList == null || certificateList.isEmpty()) {
+                System.out.println("new Certificate");
+
+                Certificate certificate = new Certificate();
+                certificate.setCourseName(course.getTitle());
+                certificate.setLearnerId(user);
+                certificate.setLearnerName(user.getLastName() + " " + user.getFirstName());
+                certificate.setTitle("Chứng chỉ " + course.getTitle());
+
+                this.certificateRepo.saveCertificate(certificate);
+            }
+
+            progress.setIsComplete(true);
+        }
+
+        this.courseProgressRepo.saveCourseProgress(progress);
     }
 }

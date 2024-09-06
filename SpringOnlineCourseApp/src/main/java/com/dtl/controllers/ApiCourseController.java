@@ -13,6 +13,8 @@ import com.dtl.pojo.CourseProgress;
 import com.dtl.pojo.User;
 import com.dtl.services.CourseProgressService;
 import com.dtl.services.CourseService;
+import com.dtl.services.CourseTagService;
+import com.dtl.services.LessonService;
 import com.dtl.services.UserService;
 import java.security.Principal;
 import java.util.HashMap;
@@ -46,6 +48,10 @@ public class ApiCourseController {
     @Autowired
     private CourseProgressService courseProgressService;
     @Autowired
+    private LessonService lessonService;
+    @Autowired
+    private CourseTagService courseTagService;
+    @Autowired
     private ErrorResponseUtil errorResponseUtil;
 
     @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +68,7 @@ public class ApiCourseController {
             if (paramPage != null && !paramPage.isEmpty()) {
                 page = paramPage;
             }
-            
+
             String paramKeyword = params.get("q");
             if (paramKeyword != null && !paramKeyword.isEmpty()) {
                 keyword = paramKeyword;
@@ -103,6 +109,11 @@ public class ApiCourseController {
             isEnrolled = this.courseService.hasEnrolled(course, userDetail);
         }
 
+        Map<String, String> params = new HashMap<>();
+        params.put("courseId", String.valueOf(id));
+        course.setLessonCollection(this.lessonService.getLessons(params));
+        course.setCourseTagCollection(this.courseTagService.getCourseTags(id, -1));
+
         CourseDetailDTO courseDetail = new CourseDetailDTO(course, isEnrolled);
 
         response.put("data", courseDetail);
@@ -118,15 +129,20 @@ public class ApiCourseController {
 
         User userDetail = this.userService.getUserByUsername(user.getName());
         Course course = this.courseService.getCourseById(courseId);
+        CourseProgress progress = this.courseProgressService.getCourseProgress(userDetail.getId(), courseId);
 
-        if (!this.courseService.hasEnrolled(course, userDetail)) {
+        if (progress == null) {
             return this.errorResponseUtil.buildErrorResponse("user.permission.deny", locale);
         }
 
         Integer totalCourseContent = this.courseService.countContentInCourse(courseId);
-        CourseProgress progress = this.courseProgressService.getCourseProgress(userDetail.getId(), courseId);
+        this.courseService.checkCourseProgress(course, userDetail, progress, totalCourseContent);
 
-        response.put("data", new CourseProgressDTO(totalCourseContent, progress.getLessonCompleteCount()));
+        boolean complete = false;
+        if (progress.getIsComplete()) {
+            complete = true;
+        }
+        response.put("data", new CourseProgressDTO(totalCourseContent, progress.getLessonCompleteCount(), complete));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

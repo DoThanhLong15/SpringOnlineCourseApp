@@ -8,6 +8,7 @@ import com.dtl.DTO.RegisterOrderDetailDTO;
 import com.dtl.DTO.RegisterOrderListDTO;
 import com.dtl.components.ErrorResponseUtil;
 import com.dtl.pojo.Cart;
+import com.dtl.pojo.Category;
 import com.dtl.pojo.Course;
 import com.dtl.pojo.CourseProgress;
 import com.dtl.pojo.RegisterDetail;
@@ -107,6 +108,10 @@ public class ApiRegisterOrder {
             orderDetail.setCourseId(cart.getCourseId());
             orderDetail.setPrice(cart.getCourseId().getPrice());
             orderDetail.setRegisterOrderId(order);
+            
+            Course course = this.courseService.getCourseById(cart.getCourseId().getId());
+            course.setParticipantCount(course.getParticipantCount() + 1);
+            this.courseService.addOrUpdateCourse(course);
 
             // Create and save CourseProgress
             CourseProgress courseProgress = new CourseProgress();
@@ -114,10 +119,6 @@ public class ApiRegisterOrder {
             courseProgress.setLearnerId(userDetail);
             courseProgress.setLessonCompleteCount(0);
             this.courseProgressService.saveCourseProgress(courseProgress);
-            
-            Course course = this.courseService.getCourseById(cart.getCourseId().getId());
-            course.setParticipantCount(course.getParticipantCount() + 1);
-            this.courseService.addOrUpdateCourse(course);
 
             // Remove cart item
             this.cartService.deleteCart(cart);

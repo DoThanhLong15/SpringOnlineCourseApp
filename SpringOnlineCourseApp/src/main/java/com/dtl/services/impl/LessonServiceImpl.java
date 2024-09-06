@@ -5,7 +5,6 @@
 package com.dtl.services.impl;
 
 import com.dtl.pojo.Lesson;
-import com.dtl.repository.LessonContentRepository;
 import com.dtl.repository.LessonRepository;
 import com.dtl.services.LessonService;
 import java.util.List;
@@ -22,8 +21,6 @@ public class LessonServiceImpl implements LessonService{
     
     @Autowired
     private LessonRepository lessonRepo;
-    @Autowired
-    private LessonContentRepository lessonContentRepo;
 
     @Override
     public List<Lesson> getLessons(Map<String, String> params) {
@@ -33,8 +30,6 @@ public class LessonServiceImpl implements LessonService{
     @Override
     public Lesson getLessonById(int id) {
         Lesson lesson = this.lessonRepo.getLessonById(id);
-        
-        lesson.setLessonContentCollection(this.lessonContentRepo.getLessonContent(lesson.getId()));
         
         return lesson;
     }

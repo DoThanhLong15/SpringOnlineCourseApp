@@ -72,7 +72,7 @@ public class Lesson implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lessonId")
     private List<LessonContent> lessonContentCollection;
     @JoinColumn(name = "course_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private Course courseId;
 
     public Lesson() {
